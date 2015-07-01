@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<SplitPane dividerPositions="0.4398034398034398" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="816.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.45" fx:controller="spdxedit.MainSceneController">
+  <items>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="268.0">
+         <children>
+             <TreeView fx:id="dirTree" prefHeight="471.0" prefWidth="354.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children></AnchorPane>
+    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="555.0">
+         <children>
+            <Button fx:id="chooseDir" layoutX="27.0" layoutY="38.0" mnemonicParsing="false" text="Choose Directory..."  onMouseClicked="#handleChooseDirectoryClicked" />
+            <Button fx:id="addPackage" layoutX="27.0" layoutY="84.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="144.0" text="Add Package" onMouseClicked="#handleAddPackageClicked"/>
+            <ListView layoutX="184.0" layoutY="-1.0" prefHeight="473.0" prefWidth="268.0"  fx:id="addedPackagesUiList" />
+         </children></AnchorPane>
+  </items>
+</SplitPane>

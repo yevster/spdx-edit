@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="446.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="ok" defaultButton="true" layoutX="459.0" layoutY="379.0" mnemonicParsing="false" text="OK" />
+      <Button fx:id="cancel" cancelButton="true" layoutX="388.0" layoutY="379.0" mnemonicParsing="false" text="Cancel" />
+      <Label layoutX="36.0" layoutY="43.0" text="Name" />
+      <Label layoutX="36.0" layoutY="78.0" text="License" />
+      <TextField layoutX="111.0" layoutY="38.0" prefHeight="31.0" prefWidth="245.0" />
+      <SplitMenuButton fx:id="license" layoutX="111.0" layoutY="73.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="245.0" text="SplitMenuButton">
+        <items>
+          <MenuItem mnemonicParsing="false" text="Action 1" />
+          <MenuItem mnemonicParsing="false" text="Action 2" />
+        </items>
+      </SplitMenuButton>
+      <TextArea layoutX="111.0" layoutY="116.0" prefHeight="237.0" prefWidth="446.0" />
+      <Label layoutX="36.0" layoutY="116.0" text="Comment" />
+   </children>
+</Pane>
