@@ -3,14 +3,15 @@ package spdxedit;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.SplitMenuButton;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
@@ -20,8 +21,11 @@ import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class PackagePropsSceneController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PackagePropsSceneController.class);
 
     @FXML
     private Button ok;
@@ -33,7 +37,7 @@ public class PackagePropsSceneController {
     private TextField name;
 
     @FXML
-    private SplitMenuButton licenseSelection;
+    private ComboBox<String> licenseSelection;
 
     @FXML
     private TextArea comment;
@@ -42,8 +46,8 @@ public class PackagePropsSceneController {
 
     private Window parentWindow;
 
-    public static final SpdxPackage createPackageWithPrompt(Window parentWindow, Path path) {
-        PackagePropsSceneController controller = new PackagePropsSceneController(path);
+    public static SpdxPackage createPackageWithPrompt(Window parentWindow, Path path) {
+        final PackagePropsSceneController controller = new PackagePropsSceneController(path);
         final Stage dialogStage = new Stage();
         dialogStage.setTitle("Create SPDX Package");
         dialogStage.initStyle(StageStyle.UTILITY);
@@ -53,8 +57,17 @@ public class PackagePropsSceneController {
         try {
             FXMLLoader loader = new FXMLLoader(PackagePropsSceneController.class.getResource("/PackagePropsScene.fxml"));
             loader.setController(controller);
-            Scene scene = new Scene(loader.load());
+            Pane pane = loader.load();
+            Scene scene = new Scene(pane);
             dialogStage.setScene(scene);
+            dialogStage.setOnShown(event -> {
+                controller.licenseSelection.getItems().clear();
+                Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().forEachOrdered(
+                        id -> controller.licenseSelection.getItems().add(id)
+                );
+            });
+            //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
+            controller.ok.setOnMouseClicked(event -> dialogStage.close());
             dialogStage.showAndWait();
             return controller.createSpdxPackageFromInputs();
 
@@ -65,13 +78,13 @@ public class PackagePropsSceneController {
 
     private PackagePropsSceneController(Path path) {
         this.path = path;
-
     }
 
 
     private SpdxPackage createSpdxPackageFromInputs() {
         try {
-            AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseSelection.getText());
+            logger.info("Generating package");
+            AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseSelection.getValue());
 
             SpdxPackage pkg = new SpdxPackage(name.getText(), license,
                     new AnyLicenseInfo[]{} /* Licences from files*/,
@@ -80,6 +93,7 @@ public class PackagePropsSceneController {
                     null /*Download Location*/,
                     new SpdxFile[]{} /*Files*/,
                     new SpdxPackageVerificationCode(name.getText(), new String[]{}));
+            pkg.setComment(comment.getText());
             return pkg;
 
 
@@ -87,6 +101,8 @@ public class PackagePropsSceneController {
             throw new RuntimeException("SPDX error", e);
         }
     }
+
+
 
 
 }

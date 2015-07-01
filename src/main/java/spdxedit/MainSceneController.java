@@ -72,6 +72,7 @@ public class MainSceneController {
         if (!chosenPath.isPresent()) return;
         try {
             dirTree.setRoot(getTreeForPath(chosenPath.get()));
+            addPackage.setDisable(false);
         } catch (IOException ioe) {
             logger.error("Unable to access directory " + chosenPath.toString(), ioe);
         }
