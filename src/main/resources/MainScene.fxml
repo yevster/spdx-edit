@@ -22,7 +22,7 @@
                 <Button fx:id="saveSpdx" layoutX="27.0" layoutY="138.0" mnemonicParsing="false" prefWidth="145"
                         text="Write SPDX..." onMouseClicked="#handleSaveSpdxClicked"/>
                 <ListView layoutX="184.0" layoutY="-1.0" prefHeight="473.0" prefWidth="268.0"
-                          fx:id="addedPackagesUiList"/>
+                          fx:id="addedPackagesUiList" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" />
             </children>
         </AnchorPane>
     </items>
