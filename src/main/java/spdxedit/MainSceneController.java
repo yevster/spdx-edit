@@ -38,7 +38,7 @@ public class MainSceneController {
 
     private static final Logger logger = LoggerFactory.getLogger(MainSceneController.class);
 
-    private static final Optional<Path> selectDirectory(Window parentWindow) {
+    private static Optional<Path> selectDirectory(Window parentWindow) {
         Objects.requireNonNull(parentWindow);
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle(Main.APP_TITLE);
@@ -51,13 +51,13 @@ public class MainSceneController {
     }
 
     private static TreeItem<Path> getTreeForPath(final Path base) throws IOException {
-        final HashMap<Path, TreeItem> addedNodes = new HashMap<>();
-        TreeItem<Path> rootNode = new TreeItem<>();
+        final HashMap<Path, TreeItem<Path>> addedNodes = new HashMap<>();
+        TreeItem<Path> rootNode = new TreeItem<>(base);
         rootNode.setExpanded(true);
         addedNodes.put(base, rootNode);
         Files.walk(base).forEachOrdered(path -> {
             if (Objects.equals(path, base)) return;
-            TreeItem<Path> current = new TreeItem<Path>(path);
+            TreeItem<Path> current = new TreeItem<>(path);
             TreeItem<Path> parent = addedNodes.get(path.getParent());
             parent.getChildren().add(current);
             addedNodes.put(path, current);

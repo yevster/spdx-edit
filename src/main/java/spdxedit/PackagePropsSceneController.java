@@ -20,6 +20,7 @@ import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -82,24 +83,7 @@ public class PackagePropsSceneController {
 
 
     private SpdxPackage createSpdxPackageFromInputs() {
-        try {
-            logger.info("Generating package");
-            AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseSelection.getValue());
-
-            SpdxPackage pkg = new SpdxPackage(name.getText(), license,
-                    new AnyLicenseInfo[]{} /* Licences from files*/,
-                    null /*Declared licenses*/,
-                    null /*Download location*/,
-                    null /*Download Location*/,
-                    new SpdxFile[]{} /*Files*/,
-                    new SpdxPackageVerificationCode(name.getText(), new String[]{}));
-            pkg.setComment(comment.getText());
-            return pkg;
-
-
-        } catch (InvalidSPDXAnalysisException e) {
-            throw new RuntimeException("SPDX error", e);
-        }
+        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(),name.getText(), comment.getText());
     }
 
 
