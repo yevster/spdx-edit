@@ -83,7 +83,6 @@ public class MainSceneController {
         if (!chosenPath.isPresent()) return;
         try {
             dirTree.setRoot(getTreeForPath(chosenPath.get()));
-            addPackage.setDisable(false);
         } catch (IOException ioe) {
             logger.error("Unable to access directory " + chosenPath.toString(), ioe);
         }
@@ -93,7 +92,7 @@ public class MainSceneController {
     public void handleSaveSpdxClicked(MouseEvent event){
         SpdxDocument document = SpdxLogic.createDocumentWithPackages(this.addedPackages);
         FileChooser chooser = new FileChooser();
-        FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "rdf");
+        FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "*.spdx");
         chooser.getExtensionFilters().add(spdxExtensionFilter);
         chooser.setSelectedExtensionFilter(spdxExtensionFilter);
 
@@ -113,6 +112,10 @@ public class MainSceneController {
         addedPackages.add(newPackage);
         addedPackagesUiList.getItems().add(newPackage.getName());
 
+    }
+
+    public void handleDirectoryTreeClicked(MouseEvent event){
+        addPackage.setDisable(dirTree.getSelectionModel().isEmpty());
     }
 
 }
