@@ -14,10 +14,12 @@
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="555.0">
             <children>
-                <Button fx:id="chooseDir" layoutX="27.0" layoutY="38.0" mnemonicParsing="false"
+                <Button fx:id="chooseDir" layoutX="27.0" layoutY="38.0" mnemonicParsing="false" prefWidth="145"
                         text="Choose Directory..." onMouseClicked="#handleChooseDirectoryClicked"/>
-                <Button fx:id="addPackage" layoutX="27.0" layoutY="84.0" mnemonicParsing="false" prefHeight="21.0"
-                        prefWidth="144.0" text="Add Package" onMouseClicked="#handleAddPackageClicked" disable="true"/>
+                <Button fx:id="addPackage" layoutX="27.0" layoutY="88.0" mnemonicParsing="false" prefHeight="21.0"
+                        prefWidth="145.0" text="Add Package" onMouseClicked="#handleAddPackageClicked" disable="true"/>
+                <Button fx:id="saveSpdx" layoutX="27.0" layoutY="138.0" mnemonicParsing="false" prefWidth="145"
+                        text="Write SPDX..." onMouseClicked="#handleSaveSpdxClicked"/>
                 <ListView layoutX="184.0" layoutY="-1.0" prefHeight="473.0" prefWidth="268.0"
                           fx:id="addedPackagesUiList"/>
             </children>

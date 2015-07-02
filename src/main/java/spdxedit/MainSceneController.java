@@ -8,12 +8,20 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.SPDXDocumentFactory;
+import org.spdx.rdfparser.SpdxDocumentContainer;
+import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +38,9 @@ public class MainSceneController {
 
     @FXML
     private Button addPackage;
+
+    @FXML
+    private Button saveSpdx;
 
     @FXML
     private ListView<String> addedPackagesUiList;
@@ -66,7 +77,7 @@ public class MainSceneController {
 
     }
 
-    @FXML
+
     public void handleChooseDirectoryClicked(MouseEvent event) {
         Optional<Path> chosenPath = selectDirectory(chooseDir.getParent().getScene().getWindow());
         if (!chosenPath.isPresent()) return;
@@ -75,6 +86,22 @@ public class MainSceneController {
             addPackage.setDisable(false);
         } catch (IOException ioe) {
             logger.error("Unable to access directory " + chosenPath.toString(), ioe);
+        }
+    }
+
+
+    public void handleSaveSpdxClicked(MouseEvent event){
+        SpdxDocument document = SpdxLogic.createDocumentWithPackages(this.addedPackages);
+        FileChooser chooser = new FileChooser();
+        FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "rdf");
+        chooser.getExtensionFilters().add(spdxExtensionFilter);
+        chooser.setSelectedExtensionFilter(spdxExtensionFilter);
+
+        File targetFile = chooser.showSaveDialog(saveSpdx.getScene().getWindow());
+        try(FileWriter writer = new FileWriter(targetFile)){
+            document.getDocumentContainer().getModel().write(writer);
+        } catch (IOException e) {
+            logger.error("Unable to write SPDX file", e);
         }
     }
 

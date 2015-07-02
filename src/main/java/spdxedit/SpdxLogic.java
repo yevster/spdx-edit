@@ -2,13 +2,18 @@ package spdxedit;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.net.MediaType;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.Relationship.RelationshipType;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
@@ -27,6 +32,24 @@ import java.util.Set;
 
 public class SpdxLogic {
     private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
+
+
+    public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages){
+        try {
+            //TODO: Add document properties dialog where real URL can be provided.
+            SpdxDocumentContainer container = new SpdxDocumentContainer("http://url.example.com/spdx/builder", "SPDX-2.0");
+            SpdxDocument document = container.getSpdxDocument();
+
+            for (SpdxPackage pkg : packages){
+                Relationship describes = new Relationship(pkg, RelationshipType.relationshipType_describes, null);
+                //No inverse relationship in case of multiple generations.
+                document.addRelationship(describes);
+            }
+            return document;
+        } catch (InvalidSPDXAnalysisException e){
+            throw new RuntimeException(e);
+        }
+    }
 
     public static SpdxPackage createSpdxPackageForPath(Path path, String licenseId, String name, String comment) {
         Objects.requireNonNull(path);
@@ -120,10 +143,10 @@ public class SpdxLogic {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        DigestInputStream dis = new DigestInputStream(Files.newInputStream(path, StandardOpenOption.READ), checksumDigest);
-        byte[] resultBytes = checksumDigest.digest();
-        return new String(resultBytes);
-
+        try(DigestInputStream dis = new DigestInputStream(Files.newInputStream(path, StandardOpenOption.READ), checksumDigest)) {
+            byte[] resultBytes = checksumDigest.digest();
+            return Hex.encodeHexString(resultBytes);
+        }
     }
 }
 
