@@ -1,28 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+
 <SplitPane dividerPositions="0.4398034398034398" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-           minWidth="-Infinity" prefHeight="473.0" prefWidth="816.0" xmlns:fx="http://javafx.com/fxml/1"
-           xmlns="http://javafx.com/javafx/8.0.45" fx:controller="spdxedit.MainSceneController">
+           minWidth="-Infinity" prefHeight="473.0" prefWidth="816.0" xmlns="http://javafx.com/javafx/8.0.45"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="spdxedit.MainSceneController">
     <items>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="268.0">
             <children>
-                <TreeView fx:id="dirTree" prefHeight="471.0" prefWidth="354.0" AnchorPane.bottomAnchor="0.0"
-                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"
-                          onMouseClicked="#handleDirectoryTreeClicked"/>
+                <TreeView fx:id="dirTree" onMouseClicked="#handleDirectoryTreeClicked" prefHeight="471.0"
+                          prefWidth="354.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
             </children>
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="555.0">
             <children>
-                <Button fx:id="chooseDir" layoutX="27.0" layoutY="38.0" mnemonicParsing="false" prefWidth="145"
-                        text="Choose Directory..." onMouseClicked="#handleChooseDirectoryClicked"/>
-                <Button fx:id="addPackage" layoutX="27.0" layoutY="88.0" mnemonicParsing="false" prefHeight="21.0"
-                        prefWidth="145.0" text="Add Package" onMouseClicked="#handleAddPackageClicked" disable="true"/>
-                <Button fx:id="saveSpdx" layoutX="27.0" layoutY="138.0" mnemonicParsing="false" prefWidth="145"
-                        text="Write SPDX..." onMouseClicked="#handleSaveSpdxClicked"/>
-                <ListView layoutX="184.0" layoutY="-1.0" prefHeight="473.0" prefWidth="268.0"
-                          fx:id="addedPackagesUiList" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" />
+                <Button fx:id="chooseDir" layoutX="14.0" layoutY="25.0" mnemonicParsing="false"
+                        onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..."/>
+                <Button fx:id="addPackage" disable="true" layoutX="14.0" layoutY="75.0" mnemonicParsing="false"
+                        onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0"
+                        text="Add Package"/>
+                <Button fx:id="saveSpdx" layoutX="14.0" layoutY="125.0" mnemonicParsing="false"
+                        onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX..."/>
+                <ListView fx:id="addedPackagesUiList" editable="true" layoutX="184.0" layoutY="-1.0" prefHeight="471.0"
+                          prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                          AnchorPane.topAnchor="0.0" onMouseClicked="#handlePackageListClicked"/>
             </children>
         </AnchorPane>
     </items>

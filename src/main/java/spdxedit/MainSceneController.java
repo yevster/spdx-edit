@@ -2,10 +2,7 @@ package spdxedit;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -18,6 +15,7 @@ import org.spdx.rdfparser.SPDXDocumentFactory;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.SpdxDocument;
+import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.File;
@@ -43,11 +41,43 @@ public class MainSceneController {
     private Button saveSpdx;
 
     @FXML
-    private ListView<String> addedPackagesUiList;
+    private ListView<SpdxPackage> addedPackagesUiList;
 
     private List<SpdxPackage> addedPackages = new LinkedList<>();
 
     private static final Logger logger = LoggerFactory.getLogger(MainSceneController.class);
+
+
+    //A representation of a package in the pacage list
+    private static class SpdxPackageListCell extends ListCell<SpdxPackage> {
+        public SpdxPackageListCell() {
+            super();
+            //A necessary hack to work around list view not selecting rows on click.
+            this.setOnMouseClicked(event -> getListView().getSelectionModel().select(this.getIndex()));
+        }
+
+        @Override
+        protected void updateItem(SpdxPackage item, boolean empty) {
+            if (empty || item == null) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                //TODO: Add graphic
+                setText(item.getName());
+            }
+        }
+    }
+
+    @FXML
+    void initialize() {
+        assert dirTree != null : "fx:id=\"dirTree\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert chooseDir != null : "fx:id=\"chooseDir\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert addPackage != null : "fx:id=\"addPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert saveSpdx != null : "fx:id=\"saveSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert addedPackagesUiList != null : "fx:id=\"addedPackagesUiList\" was not injected: check your FXML file 'MainScene.fxml'.";
+        addedPackagesUiList.setCellFactory(param -> new SpdxPackageListCell());
+
+    }
 
     private static Optional<Path> selectDirectory(Window parentWindow) {
         Objects.requireNonNull(parentWindow);
@@ -89,7 +119,7 @@ public class MainSceneController {
     }
 
 
-    public void handleSaveSpdxClicked(MouseEvent event){
+    public void handleSaveSpdxClicked(MouseEvent event) {
         SpdxDocument document = SpdxLogic.createDocumentWithPackages(this.addedPackages);
         FileChooser chooser = new FileChooser();
         FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "*.spdx");
@@ -97,24 +127,33 @@ public class MainSceneController {
         chooser.setSelectedExtensionFilter(spdxExtensionFilter);
 
         File targetFile = chooser.showSaveDialog(saveSpdx.getScene().getWindow());
-        try(FileWriter writer = new FileWriter(targetFile)){
+        try (FileWriter writer = new FileWriter(targetFile)) {
             document.getDocumentContainer().getModel().write(writer);
         } catch (IOException e) {
             logger.error("Unable to write SPDX file", e);
         }
     }
 
-    public void handleAddPackageClicked(MouseEvent event){
+    public void handleAddPackageClicked(MouseEvent event) {
         List<TreeItem<Path>> selectedNodes = dirTree.getSelectionModel().getSelectedItems();
-        assert(selectedNodes.size() <= 1);
+        assert (selectedNodes.size() <= 1);
         Path path = selectedNodes.get(0).getValue();
         SpdxPackage newPackage = PackagePropsSceneController.createPackageWithPrompt(addPackage.getScene().getWindow(), path);
         addedPackages.add(newPackage);
-        addedPackagesUiList.getItems().add(newPackage.getName());
+        addedPackagesUiList.getItems().add(newPackage);
+        if (addedPackagesUiList.getSelectionModel().getSelectedItem() == null) {
+            addedPackagesUiList.getSelectionModel().selectFirst();
+        }
 
     }
 
-    public void handleDirectoryTreeClicked(MouseEvent event){
+    public void handlePackageListClicked(MouseEvent event) {
+        if (event.getClickCount() == 2) {
+            PackageEditor.editPackage(addedPackagesUiList.getSelectionModel().getSelectedItem(), addedPackagesUiList.getScene().getWindow());
+        }
+    }
+
+    public void handleDirectoryTreeClicked(MouseEvent event) {
         addPackage.setDisable(dirTree.getSelectionModel().isEmpty());
     }
 

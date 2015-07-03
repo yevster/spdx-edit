@@ -3,8 +3,10 @@ package spdxedit;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -12,15 +14,10 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spdx.rdfparser.InvalidSPDXAnalysisException;
-import org.spdx.rdfparser.SpdxPackageVerificationCode;
-import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
-import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 
@@ -83,10 +80,8 @@ public class PackagePropsSceneController {
 
 
     private SpdxPackage createSpdxPackageFromInputs() {
-        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(),name.getText(), comment.getText());
+        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(), name.getText(), comment.getText());
     }
-
-
 
 
 }
