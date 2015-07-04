@@ -63,6 +63,9 @@ public class PackagePropsSceneController {
                 Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().forEachOrdered(
                         id -> controller.licenseSelection.getItems().add(id)
                 );
+                controller.name.setText(path.getFileName().toString());
+                controller.licenseSelection.getSelectionModel().selectFirst();
+
             });
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
             controller.ok.setOnMouseClicked(event -> dialogStage.close());

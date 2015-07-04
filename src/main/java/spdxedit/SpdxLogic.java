@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.net.MediaType;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -34,19 +35,19 @@ public class SpdxLogic {
     private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
 
 
-    public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages){
+    public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages) {
         try {
             //TODO: Add document properties dialog where real URL can be provided.
             SpdxDocumentContainer container = new SpdxDocumentContainer("http://url.example.com/spdx/builder", "SPDX-2.0");
             SpdxDocument document = container.getSpdxDocument();
 
-            for (SpdxPackage pkg : packages){
+            for (SpdxPackage pkg : packages) {
                 Relationship describes = new Relationship(pkg, RelationshipType.relationshipType_describes, null);
                 //No inverse relationship in case of multiple generations.
                 document.addRelationship(describes);
             }
             return document;
-        } catch (InvalidSPDXAnalysisException e){
+        } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException(e);
         }
     }
@@ -143,10 +144,15 @@ public class SpdxLogic {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        try(DigestInputStream dis = new DigestInputStream(Files.newInputStream(path, StandardOpenOption.READ), checksumDigest)) {
+        try (DigestInputStream dis = new DigestInputStream(Files.newInputStream(path, StandardOpenOption.READ), checksumDigest)) {
             byte[] resultBytes = checksumDigest.digest();
             return Hex.encodeHexString(resultBytes);
         }
+    }
+
+    public static String toString(FileType fileType) {
+        Objects.requireNonNull(fileType);
+        return WordUtils.capitalize(StringUtils.lowerCase(fileType.getTag()));
     }
 }
 
