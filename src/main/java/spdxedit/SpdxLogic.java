@@ -32,13 +32,46 @@ import java.util.stream.Collectors;
 public class SpdxLogic {
     private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
 
+    public static SpdxDocument createEmptyDocument(String uri) {
+
+        SpdxDocumentContainer container = null;
+        try {
+            container = new SpdxDocumentContainer(uri, "SPDX-2.0");
+            return container.getSpdxDocument();
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException("Unable to create blank SPDX document", e);
+        }
+
+
+    }
+
+    public static void addPackageToDocument(SpdxDocument document, SpdxPackage pkg){
+        try {
+            pkg.addRelationship(new Relationship(document, RelationshipType.relationshipType_describedBy, null));
+            document.addRelationship(new Relationship(pkg, RelationshipType.relationshipType_describes, null));
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException("Unable to add package to document");
+
+        }
+
+    }
+
+
+    public static List<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document){
+        List<SpdxPackage> packages = Arrays.stream(document.getRelationships())
+                .filter(relationship -> relationship.getRelationshipType() == RelationshipType.relationshipType_describes)
+                //Just in case
+                .filter(relationship -> relationship.getRelatedSpdxElement() instanceof SpdxPackage)
+                .map(relationship -> (SpdxPackage) relationship.getRelatedSpdxElement())
+                .collect(Collectors.toList());
+        return Collections.unmodifiableList(packages);
+
+    }
 
     public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages) {
         try {
             //TODO: Add document properties dialog where real URL can be provided.
-            SpdxDocumentContainer container = new SpdxDocumentContainer("http://url.example.com/spdx/builder", "SPDX-2.0");
-            SpdxDocument document = container.getSpdxDocument();
-
+            SpdxDocument document = createEmptyDocument("http://url.example.com/spdx/builder");
             for (SpdxPackage pkg : packages) {
                 Relationship describes = new Relationship(pkg, RelationshipType.relationshipType_describes, null);
                 //No inverse relationship in case of multiple generations.

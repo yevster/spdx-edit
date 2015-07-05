@@ -24,6 +24,8 @@
                         text="Add Package"/>
                 <Button fx:id="saveSpdx" layoutX="14.0" layoutY="125.0" mnemonicParsing="false"
                         onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX..."/>
+                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="175.0" mnemonicParsing="false"
+                        onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX..."/>
                 <ListView fx:id="addedPackagesUiList" editable="true" layoutX="184.0" layoutY="-1.0" prefHeight="471.0"
                           prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
                           AnchorPane.topAnchor="0.0" onMouseClicked="#handlePackageListClicked"/>

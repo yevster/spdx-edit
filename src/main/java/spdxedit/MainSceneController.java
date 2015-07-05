@@ -1,30 +1,29 @@
 package spdxedit;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SPDXDocumentFactory;
-import org.spdx.rdfparser.SpdxDocumentContainer;
-import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.SpdxDocument;
-import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class MainSceneController {
 
@@ -43,7 +42,7 @@ public class MainSceneController {
     @FXML
     private ListView<SpdxPackage> addedPackagesUiList;
 
-    private List<SpdxPackage> addedPackages = new LinkedList<>();
+    private SpdxDocument documentToEdit = SpdxLogic.createEmptyDocument("http://url.example.com/spdx/builder");
 
     private static final Logger logger = LoggerFactory.getLogger(MainSceneController.class);
 
@@ -66,6 +65,15 @@ public class MainSceneController {
                 setText(item.getName());
             }
         }
+    }
+
+
+    private FileChooser getSpdxFileChooser() {
+        FileChooser chooser = new FileChooser();
+        FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "*.spdx");
+        chooser.getExtensionFilters().add(spdxExtensionFilter);
+        chooser.setSelectedExtensionFilter(spdxExtensionFilter);
+        return chooser;
     }
 
     @FXML
@@ -120,15 +128,9 @@ public class MainSceneController {
 
 
     public void handleSaveSpdxClicked(MouseEvent event) {
-        SpdxDocument document = SpdxLogic.createDocumentWithPackages(this.addedPackages);
-        FileChooser chooser = new FileChooser();
-        FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "*.spdx");
-        chooser.getExtensionFilters().add(spdxExtensionFilter);
-        chooser.setSelectedExtensionFilter(spdxExtensionFilter);
-
-        File targetFile = chooser.showSaveDialog(saveSpdx.getScene().getWindow());
+        File targetFile = getSpdxFileChooser().showSaveDialog(saveSpdx.getScene().getWindow());
         try (FileWriter writer = new FileWriter(targetFile)) {
-            document.getDocumentContainer().getModel().write(writer);
+            this.documentToEdit.getDocumentContainer().getModel().write(writer);
         } catch (IOException e) {
             logger.error("Unable to write SPDX file", e);
         }
@@ -139,12 +141,30 @@ public class MainSceneController {
         assert (selectedNodes.size() <= 1);
         Path path = selectedNodes.get(0).getValue();
         SpdxPackage newPackage = PackagePropsSceneController.createPackageWithPrompt(addPackage.getScene().getWindow(), path);
-        addedPackages.add(newPackage);
+        SpdxLogic.addPackageToDocument(this.documentToEdit, newPackage);
         addedPackagesUiList.getItems().add(newPackage);
         if (addedPackagesUiList.getSelectionModel().getSelectedItem() == null) {
             addedPackagesUiList.getSelectionModel().selectFirst();
         }
+    }
 
+
+    public void handleLoadSpdxClicked(MouseEvent event) {
+        File targetFile = getSpdxFileChooser().showOpenDialog(saveSpdx.getScene().getWindow());
+        try {
+            SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());
+            this.documentToEdit = loadedDocument;
+            this.addedPackagesUiList.getItems().setAll(SpdxLogic.getSpdxPackagesInDocument(loadedDocument));
+        } catch (InvalidSPDXAnalysisException isae) {
+            logger.error("Invalid SPDX load attempt", isae);
+            new Alert(Alert.AlertType.ERROR, "Invalid SPDX file " + targetFile.getAbsolutePath());
+        } catch (FileNotFoundException fnfe) {
+            logger.error("File not found: " + targetFile.getAbsolutePath());
+            new Alert(Alert.AlertType.ERROR, "File " + targetFile.getAbsolutePath() + " not found").showAndWait();
+        } catch (IOException ioe) {
+            logger.error("Error loading SPDX", ioe);
+            new Alert(Alert.AlertType.ERROR, "Error loading SPDX file " + targetFile.getAbsolutePath());
+        }
     }
 
     public void handlePackageListClicked(MouseEvent event) {
