@@ -9,11 +9,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
@@ -28,7 +30,10 @@ import spdxedit.util.StringableWrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,7 +56,9 @@ public class PackageEditor {
     @FXML
     private Button btnOk;
 
-    /*** FILE INFORMATION REPRESENTATIONS ***/
+    /***
+     * FILE INFORMATION REPRESENTATIONS
+     ***/
 
     @FXML
     private CheckListView<StringableWrapper<FileType>> chkListFileTypes;
@@ -74,12 +81,45 @@ public class PackageEditor {
     @FXML
     private CheckBox chkBuildTool;
 
+    /**
+     * PACKAGE RELATIONSHIP REPRESENTATIONS
+     **/
+    @FXML
+    private ListView<SpdxPackage> lstTargetPackages;
+
+    @FXML
+    private ChoiceBox<RelationshipType> chcNewRelationshipType;
+
+    @FXML
+    private Button btnAddRelationship;
+
+    @FXML
+    private Button btnRemoveRelationship;
+
+    @FXML
+    private ListView<StringableWrapper<RelationshipType>> lstPackageRelationships;
+
+    private static final StringConverter<RelationshipType> RELATIONSHIP_TYPE_STRING_CONVERTER = new StringConverter<RelationshipType>() {
+        @Override
+        public String toString(RelationshipType relationshipType) {
+            return SpdxLogic.toString(relationshipType);
+        }
+
+        @Override
+        public RelationshipType fromString(String string) {
+            throw new UnsupportedOperationException("Shoudln't have to convert strings to relationship types");
+        }
+    };
+
 
     //The package being edited
     private SpdxPackage pkg;
 
     //The file currently being edited
     private SpdxFile currentFile;
+
+    //Packages to which the edited package can have a relationship
+    private List<SpdxPackage> otherPackages;
 
 
     @FXML
@@ -99,16 +139,42 @@ public class PackageEditor {
         assert chkMetafile != null : "fx:id=\"chkMetafile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkBuildTool != null : "fx:id=\"chkBuildTool\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
-        //Initialise relationship checkbox handling
+        //Package relationship controls
+        assert lstTargetPackages != null : "fx:id=\"lstTargetPackages\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chcNewRelationshipType != null : "fx:id=\"chcNewRelationshipType\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnAddRelationship != null : "fx:id=\"btnAddRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnRemoveRelationship != null : "fx:id=\"btnRemoveRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+
+        //Initialise file relationship checkbox handling
         //TODO: Could make this easier by extending the CheckBox control?
         chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
-        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
-        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
-        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
-        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
+        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
+        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
+        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
+        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
         chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
-        //Initialize other elements
 
+        //Initialize package relationship contorls
+        lstTargetPackages.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> handleTargetPackageSelected(newValue1));
+        lstTargetPackages.setCellFactory(listView -> new MainSceneController.SpdxPackageListCell());
+        lstPackageRelationships.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> btnRemoveRelationship.setDisable(newValue1 == null));
+        //Package relationship types
+        chcNewRelationshipType.setConverter(RELATIONSHIP_TYPE_STRING_CONVERTER);
+        chcNewRelationshipType.getItems().setAll(
+                Stream.of(RelationshipType.relationshipType_dynamicLink,
+                        RelationshipType.relationshipType_staticLink,
+                        RelationshipType.relationshipType_generatedFrom,
+                        RelationshipType.relationshipType_generates,
+                        RelationshipType.relationshipType_hasPrerequisite,
+                        RelationshipType.relationshipType_prerequisiteFor,
+                        RelationshipType.relationshipType_other)
+                        .collect(Collectors.toList()));
+        chcNewRelationshipType.getSelectionModel().selectFirst();
+         assert (otherPackages != null); //Constructor finished executing
+        lstTargetPackages.getItems().setAll(otherPackages);
+
+        //Initialize other elements
         tblColumnFile.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<SpdxFile, String> param) ->
                         new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
@@ -120,14 +186,17 @@ public class PackageEditor {
         chkListFileTypes.getCheckModel().getCheckedItems().addListener(this::handleFileTypeCheckedOrUnchecked);
         filesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFileSelected(newValue));
         filesTable.setShowRoot(false);
+
+
     }
 
 
-    public static void editPackage(final SpdxPackage pkg, Window parentWindow) {
-        final PackageEditor packageEditor = new PackageEditor(pkg);
+    public static void editPackage(final SpdxPackage pkg, final List<SpdxPackage> relatablePackages, Window parentWindow) {
+
+        final PackageEditor packageEditor = new PackageEditor(pkg, relatablePackages);
         final Stage dialogStage = new Stage();
-        dialogStage.setTitle("Edit SPDX Package");
-        dialogStage.initStyle(StageStyle.UTILITY);
+        dialogStage.setTitle("Edit SPDX Package: "+pkg.getName());
+        dialogStage.initStyle(StageStyle.DECORATED);
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setY(parentWindow.getX() + parentWindow.getWidth() / 2);
         dialogStage.setY(parentWindow.getY() + parentWindow.getHeight() / 2);
@@ -162,9 +231,9 @@ public class PackageEditor {
         }
     }
 
-    private PackageEditor(SpdxPackage pkg) {
+    private PackageEditor(SpdxPackage pkg, List<SpdxPackage> relatablePackages) {
         this.pkg = pkg;
-
+        this.otherPackages = relatablePackages;
     }
 
     //Load the values for the file in all file editing contorls
@@ -178,9 +247,9 @@ public class PackageEditor {
             chkListFileTypes.getCheckModel().clearChecks();
             //The element lookup by index seems to be broken on the CheckListView control,
             //so we'll have to provide the indices
-            for (int i=0; i<chkListFileTypes.getItems().size(); ++i){
+            for (int i = 0; i < chkListFileTypes.getItems().size(); ++i) {
                 StringableWrapper<FileType> item = chkListFileTypes.getItems().get(i);
-                if (ArrayUtils.contains(newSelection.getValue().getFileTypes(), item.getValue())){
+                if (ArrayUtils.contains(newSelection.getValue().getFileTypes(), item.getValue())) {
                     chkListFileTypes.getCheckModel().check(i);
                 }
             }
@@ -200,24 +269,53 @@ public class PackageEditor {
         }
     }
 
-    private void handleFileTypeCheckedOrUnchecked(ListChangeListener.Change<? extends StringableWrapper<FileType>> change){
+    private void handleFileTypeCheckedOrUnchecked(ListChangeListener.Change<? extends StringableWrapper<FileType>> change) {
         if (currentFile == null) return;
         FileType[] newFileTypes = change.getList().stream()
                 .map(wrappedType -> wrappedType.getValue()) //Unwrap the stringable wrapper
                 .toArray(size -> new FileType[size]); //Get array
         try {
             currentFile.setFileTypes(newFileTypes);
-        } catch (InvalidSPDXAnalysisException e){
-            logger.error("Unable to update types of file "+currentFile.getName());
+        } catch (InvalidSPDXAnalysisException e) {
+            logger.error("Unable to update types of file " + currentFile.getName());
         }
     }
 
-    private void addOrRemoveRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist){
+    private void addOrRemoveRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
         if (currentFile != null) {
             SpdxLogic.setFileRelationshipToPackage(currentFile, pkg, relationshipType, shouldExist);
         }
     }
 
+    public void handleBtnAddRelationshipClick(MouseEvent event) {
+        assert (lstTargetPackages.getSelectionModel().getSelectedItems().size() > 0);
+        assert (chcNewRelationshipType.getSelectionModel().getSelectedIndex() >= 0);
+        SpdxPackage targetPackage = lstTargetPackages.getSelectionModel().getSelectedItem();
+        RelationshipType relationshipType = chcNewRelationshipType.getSelectionModel().getSelectedItem();
+        //TODO: remove existing relationship types from dropdown
+        try {
+            pkg.addRelationship(new Relationship(targetPackage, relationshipType, null));
+            lstPackageRelationships.getItems().add(StringableWrapper.wrap(relationshipType, SpdxLogic::toString));
+        } catch (InvalidSPDXAnalysisException e) {
+            logger.error("Unable to add package relationship", e);
+            new Alert(Alert.AlertType.ERROR, "Unable to add relationship").showAndWait();
+        }
+    }
 
+    public void handleBtnRemoveClick(MouseEvent event) {
+        assert (lstTargetPackages.getSelectionModel().getSelectedItems().size() > 0);
+        assert (lstPackageRelationships.getSelectionModel().getSelectedItems().size() > 0);
+    }
+
+    private void handleTargetPackageSelected(SpdxPackage pkg){
+        //Get the relationshpis the edited package has to the selected target package.
+        List<StringableWrapper<RelationshipType>> relationshipTypes = Arrays.stream(this.pkg.getRelationships())
+                .filter(relationship -> Objects.equals(relationship.getRelatedSpdxElement(), pkg))
+                .map(Relationship::getRelationshipType)
+                .map(relationshipType -> StringableWrapper.wrap(relationshipType, SpdxLogic::toString))
+                .collect(Collectors.toList());
+        lstPackageRelationships.getItems().setAll(relationshipTypes);
+        btnAddRelationship.setDisable(pkg == null);
+    }
 
 }

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class MainSceneController {
 
@@ -48,7 +49,7 @@ public class MainSceneController {
 
 
     //A representation of a package in the pacage list
-    private static class SpdxPackageListCell extends ListCell<SpdxPackage> {
+    static class SpdxPackageListCell extends ListCell<SpdxPackage> {
         public SpdxPackageListCell() {
             super();
             //A necessary hack to work around list view not selecting rows on click.
@@ -57,6 +58,7 @@ public class MainSceneController {
 
         @Override
         protected void updateItem(SpdxPackage item, boolean empty) {
+            super.updateItem(item, empty);
             if (empty || item == null) {
                 setText(null);
                 setGraphic(null);
@@ -154,7 +156,7 @@ public class MainSceneController {
         try {
             SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());
             this.documentToEdit = loadedDocument;
-            this.addedPackagesUiList.getItems().setAll(SpdxLogic.getSpdxPackagesInDocument(loadedDocument));
+            this.addedPackagesUiList.getItems().setAll(SpdxLogic.getSpdxPackagesInDocument(loadedDocument).collect(Collectors.toList()));
         } catch (InvalidSPDXAnalysisException isae) {
             logger.error("Invalid SPDX load attempt", isae);
             new Alert(Alert.AlertType.ERROR, "Invalid SPDX file " + targetFile.getAbsolutePath());
@@ -169,7 +171,11 @@ public class MainSceneController {
 
     public void handlePackageListClicked(MouseEvent event) {
         if (event.getClickCount() == 2) {
-            PackageEditor.editPackage(addedPackagesUiList.getSelectionModel().getSelectedItem(), addedPackagesUiList.getScene().getWindow());
+            SpdxPackage toEdit = addedPackagesUiList.getSelectionModel().getSelectedItem();
+            List<SpdxPackage> otherPackages = SpdxLogic.getSpdxPackagesInDocument(documentToEdit)
+                    .filter(spdxPackage -> !Objects.equals(spdxPackage, toEdit))
+                    .collect(Collectors.toList());
+            PackageEditor.editPackage(toEdit, otherPackages, addedPackagesUiList.getScene().getWindow());
         }
     }
 

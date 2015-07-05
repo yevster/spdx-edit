@@ -36,7 +36,16 @@
             </TitledPane>
             <TitledPane fx:id="tabRelationships" animated="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationshpis">
                 <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                     <ListView fx:id="lstTargetPackages" layoutX="17.0" layoutY="35.0" prefHeight="302.0" prefWidth="254.0" />
+                     <Label layoutX="17.0" layoutY="14.0" text="Target pagackage" />
+                     <ListView fx:id="lstPackageRelationships" layoutX="290.0" layoutY="35.0" prefHeight="195.0" prefWidth="280.0" />
+                     <Label layoutX="290.0" layoutY="14.0" text="Relationships" />
+                     <ChoiceBox fx:id="chcNewRelationshipType" layoutX="290.0" layoutY="239.0" prefHeight="31.0" prefWidth="147.0" />
+                     <Button fx:id="btnAddRelationship" disable="true" layoutX="443.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnAddRelationshipClick" text="Add" />
+                     <Button fx:id="btnRemoveRelationship" disable="true" layoutX="496.0" layoutY="239.0" mnemonicParsing="false" onAction="#handleBtnRemoveClick" text="Remove"/>
+                  </children></AnchorPane>
                 </content>
             </TitledPane>
         </panes>

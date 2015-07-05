@@ -27,6 +27,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class SpdxLogic {
@@ -57,15 +58,12 @@ public class SpdxLogic {
     }
 
 
-    public static List<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document){
-        List<SpdxPackage> packages = Arrays.stream(document.getRelationships())
+    public static Stream<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document){
+        return Arrays.stream(document.getRelationships())
                 .filter(relationship -> relationship.getRelationshipType() == RelationshipType.relationshipType_describes)
                 //Just in case
                 .filter(relationship -> relationship.getRelatedSpdxElement() instanceof SpdxPackage)
-                .map(relationship -> (SpdxPackage) relationship.getRelatedSpdxElement())
-                .collect(Collectors.toList());
-        return Collections.unmodifiableList(packages);
-
+                .map(relationship -> (SpdxPackage) relationship.getRelatedSpdxElement());
     }
 
     public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages) {
@@ -186,6 +184,10 @@ public class SpdxLogic {
         return WordUtils.capitalize(StringUtils.lowerCase(fileType.getTag()));
     }
 
+    public static String toString(RelationshipType relationshipType){
+        Objects.requireNonNull(relationshipType);
+        return WordUtils.capitalize(StringUtils.lowerCase(StringUtils.replace(relationshipType.getTag(), "_", " ")));
+    }
 
     /**
      * Finds the first relationship that the source element has to the target of the specified type.
@@ -203,6 +205,19 @@ public class SpdxLogic {
         assert (foundRelationships.size() <= 1);
         return foundRelationships.size() == 0 ? Optional.empty() : Optional.of(foundRelationships.get(0));
 
+    }
+
+    public static void removeRelationship(SpdxElement source, RelationshipType relationshipType, SpdxElement target){
+        try {
+            Objects.requireNonNull(target);
+            Relationship[] newRelationships = Arrays.stream(source.getRelationships())
+                    //Filter out the relationship to remove
+                    .filter(relationship -> relationship.getRelationshipType() != relationshipType && !Objects.equals(relationship.getRelatedSpdxElement(), target))
+                    .toArray(size -> new Relationship[size]);
+            source.setRelationships(newRelationships);
+        } catch (InvalidSPDXAnalysisException e){
+            throw new RuntimeException("Illegal SPDX", e); //Never should happen
+        }
     }
 
     /**
