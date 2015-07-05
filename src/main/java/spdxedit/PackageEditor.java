@@ -19,6 +19,8 @@ import org.controlsfx.control.CheckListView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
@@ -44,13 +46,33 @@ public class PackageEditor {
     private TreeTableColumn<SpdxFile, String> tblColumnFile;
 
     @FXML
-    private CheckListView<StringableWrapper<FileType>> chkListFileTypes;
-
-    @FXML
     private TitledPane tabRelationships;
 
     @FXML
     private Button btnOk;
+
+    /*** FILE INFORMATION REPRESENTATIONS ***/
+
+    @FXML
+    private CheckListView<StringableWrapper<FileType>> chkListFileTypes;
+
+    @FXML
+    private CheckBox chkDataFile;
+
+    @FXML
+    private CheckBox chkTestCase;
+
+    @FXML
+    private CheckBox chkDocumentation;
+
+    @FXML
+    private CheckBox chkOptionalComponent;
+
+    @FXML
+    private CheckBox chkMetafile;
+
+    @FXML
+    private CheckBox chkBuildTool;
 
 
     //The package being edited
@@ -68,6 +90,25 @@ public class PackageEditor {
         assert chkListFileTypes != null : "fx:id=\"chkListFileTypes\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert tabRelationships != null : "fx:id=\"tabRelationships\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnOk != null : "fx:id=\"btnOk\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+        //File relationship checkboxes
+        assert chkDataFile != null : "fx:id=\"chkDataFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkTestCase != null : "fx:id=\"chkTestCase\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkDocumentation != null : "fx:id=\"chkDocumentation\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkOptionalComponent != null : "fx:id=\"chkOptionalComponent\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkMetafile != null : "fx:id=\"chkMetafile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkBuildTool != null : "fx:id=\"chkBuildTool\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+        //Initialise relationship checkbox handling
+        //TODO: Could make this easier by extending the CheckBox control?
+        chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
+        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
+        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
+        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
+        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue)  -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
+        chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
+        //Initialize other elements
+
         tblColumnFile.setCellValueFactory(
                 (TreeTableColumn.CellDataFeatures<SpdxFile, String> param) ->
                         new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
@@ -90,6 +131,7 @@ public class PackageEditor {
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setY(parentWindow.getX() + parentWindow.getWidth() / 2);
         dialogStage.setY(parentWindow.getY() + parentWindow.getHeight() / 2);
+        dialogStage.setResizable(false);
         try {
             FXMLLoader loader = new FXMLLoader(PackagePropsSceneController.class.getResource("/PackageEditor.fxml"));
             loader.setController(packageEditor);
@@ -104,7 +146,7 @@ public class PackageEditor {
                     TreeItem<SpdxFile> root = new TreeItem<>(dummyfile);
                     packageEditor.filesTable.setRoot(root);
 
-                    root.getChildren().setAll(Stream.of(pkg.getFiles()).map(spdxFile -> new TreeItem<>(spdxFile)).collect(Collectors.toList()));
+                    root.getChildren().setAll(Stream.of(pkg.getFiles()).map(TreeItem<SpdxFile>::new).collect(Collectors.toList()));
                 } catch (InvalidSPDXAnalysisException e) {
                     logger.error("Unable to get files for package " + pkg.getName(), e);
                 }
@@ -142,6 +184,18 @@ public class PackageEditor {
                     chkListFileTypes.getCheckModel().check(i);
                 }
             }
+
+            //Reset the relationship checkboxes
+            chkDataFile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_dataFile, pkg).isPresent());
+            chkTestCase.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_testcaseOf, pkg).isPresent());
+            chkDocumentation.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_documentation, pkg).isPresent());
+            chkMetafile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_metafileOf, pkg).isPresent());
+            chkOptionalComponent.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_optionalComponentOf, pkg).isPresent());
+            chkBuildTool.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_buildToolOf, pkg).isPresent());
+
+            //Set the file relationship checkboxes
+            Relationship[] relationships = newSelection.getValue().getRelationships();
+
             currentFile = newSelection.getValue();
         }
     }
@@ -155,6 +209,12 @@ public class PackageEditor {
             currentFile.setFileTypes(newFileTypes);
         } catch (InvalidSPDXAnalysisException e){
             logger.error("Unable to update types of file "+currentFile.getName());
+        }
+    }
+
+    private void addOrRemoveRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist){
+        if (currentFile != null) {
+            SpdxLogic.setFileRelationshipToPackage(currentFile, pkg, relationshipType, shouldExist);
         }
     }
 

@@ -1,6 +1,7 @@
 package spdxedit;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
@@ -12,13 +13,11 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
-import org.spdx.rdfparser.model.Relationship;
+import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
-import org.spdx.rdfparser.model.SpdxDocument;
-import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
-import org.spdx.rdfparser.model.SpdxPackage;
 
+import javax.management.relation.Relation;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,9 +25,8 @@ import java.nio.file.StandardOpenOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class SpdxLogic {
@@ -74,8 +72,8 @@ public class SpdxLogic {
                         FileType[] fileTypes = getTypesForFile(path2);
                         try {
                             String checksum = getChecksumForFile(path2);
-                            SpdxFile file = new SpdxFile(path2.getFileName().toString(), fileTypes, checksum, null, null, null, null, null, null);
-                            return file;
+                            SpdxFile addedFile = new SpdxFile(path2.getFileName().toString(), fileTypes, checksum, null, null, null, null, null, null);
+                            return addedFile;
                         } catch (IOException ioe) {
                             logger.error("Unable to get checksum for file " + path.toAbsolutePath().toString() + ". File omitted from package.");
                             return null; //To be filtered downstream
@@ -153,6 +151,55 @@ public class SpdxLogic {
     public static String toString(FileType fileType) {
         Objects.requireNonNull(fileType);
         return WordUtils.capitalize(StringUtils.lowerCase(fileType.getTag()));
+    }
+
+
+    /**
+     * Finds the first relationship that the source element has to the target of the specified type.
+     *
+     * @param source
+     * @param relationshipType
+     * @param target
+     * @return
+     */
+    public static Optional<Relationship> findRelationship(SpdxElement source, RelationshipType relationshipType, SpdxElement target) {
+        Objects.requireNonNull(target);
+        List<Relationship> foundRelationships = Arrays.stream(source.getRelationships())
+                .filter(relationship -> relationship.getRelationshipType() == relationshipType && Objects.equals(target, relationship.getRelatedSpdxElement()))
+                .collect(Collectors.<Relationship>toList());
+        assert (foundRelationships.size() <= 1);
+        return foundRelationships.size() == 0 ? Optional.empty() : Optional.of(foundRelationships.get(0));
+
+    }
+
+    /**
+     * Updates whether or not a file has the specified relationship to the package.
+     *
+     * @param file
+     * @param pkg
+     * @param relationshipType
+     * @param shouldExist      Whether or not the file should have the specified relationship to the package.
+     */
+    public static void setFileRelationshipToPackage(SpdxFile file, SpdxPackage pkg, RelationshipType relationshipType, boolean shouldExist) {
+        // Assuming no practical usecase requiring enforcement of atomicity
+        Optional<Relationship> existingRelationship = findRelationship(file, relationshipType, pkg);
+        try {
+
+            if (shouldExist && !existingRelationship.isPresent()) { //Create the relationship if empty.
+                ArrayList<Relationship> newRelationships = new ArrayList<>(file.getRelationships().length + 1);
+                Arrays.stream(file.getRelationships()).forEach(relationship -> newRelationships.add(relationship));
+                newRelationships.add(new Relationship(pkg, relationshipType, null));
+                file.setRelationships(newRelationships.toArray(new Relationship[]{}));
+            }
+            if (!shouldExist && existingRelationship.isPresent()) {
+                ArrayList<Relationship> newRelationships = Lists.newArrayList(file.getRelationships());
+                boolean removed = newRelationships.remove(existingRelationship);
+                assert (removed);
+                file.setRelationships(newRelationships.toArray(new Relationship[]{}));
+            }
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 
