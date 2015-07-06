@@ -11,7 +11,7 @@
     <Label layoutX="36.0" layoutY="43.0" text="Name" />
     <Label layoutX="36.0" layoutY="78.0" text="License" />
     <TextField fx:id="name" layoutX="111.0" layoutY="38.0" prefHeight="31.0" prefWidth="245.0" />
-    <ComboBox fx:id="licenseSelection" editable="true" layoutX="111.0" layoutY="73.0" prefHeight="31.0" prefWidth="245.0" />
+    <ComboBox fx:id="licenseSelection" layoutX="111.0" layoutY="73.0" prefHeight="31.0" prefWidth="245.0" />
     <TextArea fx:id="comment" layoutX="111.0" layoutY="116.0" prefHeight="237.0" prefWidth="446.0" />
     <Label layoutX="36.0" layoutY="116.0" text="Comment" />
    <CheckBox fx:id="chkOmitHiddenFiles" layoutX="111.0" layoutY="364.0" mnemonicParsing="false" selected="true" text="Omit Hidden Files" />

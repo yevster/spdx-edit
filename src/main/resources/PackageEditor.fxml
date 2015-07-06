@@ -44,6 +44,7 @@
                      <CheckBox fx:id="chkOptionalComponent" layoutX="561.0" layoutY="217.0" mnemonicParsing="false" text="Optional Component" />
                      <CheckBox fx:id="chkMetafile" layoutX="561.0" layoutY="257.0" mnemonicParsing="false" text="Metafile" />
                      <Label layoutX="561.0" layoutY="14.0" text="Relationship to package:" />
+                     <Button fx:id="btnDeleteFileFromPackage" disable="true" layoutX="541.0" layoutY="333.0" mnemonicParsing="false" onMouseClicked="#handleDeleteFileFromPackageClick" text="Delete" />
                         </children>
                     </AnchorPane>
                 </content>
@@ -51,6 +52,6 @@
         </panes>
     </Accordion>
     <ButtonBar layoutX="409.0" layoutY="414.0" maxWidth="1.7976931348623157E308" prefHeight="40.0" />
-    <Button fx:id="btnOk" defaultButton="true" layoutX="879.0" layoutY="434.0" mnemonicParsing="false" text="OK" />
+    <Button fx:id="btnOk" defaultButton="true" layoutX="879.0" layoutY="438.0" mnemonicParsing="false" text="OK" />
 
 </Pane>

@@ -268,5 +268,16 @@ public class SpdxLogic {
             throw new RuntimeException(e);
         }
     }
+
+    public static void removeFileFromPackage(SpdxPackage pkg, SpdxFile fileToRemove){
+        try {
+            SpdxFile[] newFiles = Arrays.stream(pkg.getFiles())
+                    .filter(currentFile -> !Objects.equals(fileToRemove, currentFile))
+                    .toArray(size -> new SpdxFile[size]);
+            pkg.setFiles(newFiles);
+        } catch (InvalidSPDXAnalysisException e){
+            throw new RuntimeException(e);
+        }
+    }
 }
 

@@ -52,6 +52,9 @@ public class PackageEditor {
     @FXML
     private Button btnOk;
 
+    @FXML
+    private Button btnDeleteFileFromPackage;
+
     /***
      * FILE INFORMATION REPRESENTATIONS
      ***/
@@ -126,6 +129,8 @@ public class PackageEditor {
         assert chkListFileTypes != null : "fx:id=\"chkListFileTypes\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert tabRelationships != null : "fx:id=\"tabRelationships\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnOk != null : "fx:id=\"btnOk\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnDeleteFileFromPackage != null : "fx:id=\"btnDeleteFileFromPackage\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
 
         //File relationship checkboxes
         assert chkDataFile != null : "fx:id=\"chkDataFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
@@ -215,6 +220,7 @@ public class PackageEditor {
                 } catch (InvalidSPDXAnalysisException e) {
                     logger.error("Unable to get files for package " + pkg.getName(), e);
                 }
+                packageEditor.tabFiles.setExpanded(true);
             });
 
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
@@ -234,6 +240,7 @@ public class PackageEditor {
 
     //Load the values for the file in all file editing contorls
     private void handleFileSelected(TreeItem<SpdxFile> newSelection) {
+        btnDeleteFileFromPackage.setDisable(newSelection == null);
         if (newSelection == null) {
             currentFile = null;
         } else {
@@ -243,12 +250,13 @@ public class PackageEditor {
             chkListFileTypes.getCheckModel().clearChecks();
             //The element lookup by index seems to be broken on the CheckListView control,
             //so we'll have to provide the indices
-            for (int i = 0; i < chkListFileTypes.getItems().size(); ++i) {
-                StringableWrapper<FileType> item = chkListFileTypes.getItems().get(i);
-                if (ArrayUtils.contains(newSelection.getValue().getFileTypes(), item.getValue())) {
-                    chkListFileTypes.getCheckModel().check(i);
-                }
-            }
+
+            chkListFileTypes.getItems().forEach(item -> {
+                if (ArrayUtils.contains(newSelection.getValue().getFileTypes(), item.getValue()))
+                    chkListFileTypes.getCheckModel().check(item);
+                else chkListFileTypes.getCheckModel().clearCheck(item);
+            });
+
 
             //Reset the relationship checkboxes
             chkDataFile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_dataFile, pkg).isPresent());
@@ -275,6 +283,12 @@ public class PackageEditor {
         } catch (InvalidSPDXAnalysisException e) {
             logger.error("Unable to update types of file " + currentFile.getName());
         }
+    }
+
+    public void handleDeleteFileFromPackageClick(MouseEvent event){
+        SpdxFile fileToRemove = filesTable.getSelectionModel().getSelectedItem().getValue();
+        filesTable.getRoot().getChildren().remove(filesTable.getSelectionModel().getSelectedItem());
+        SpdxLogic.removeFileFromPackage(pkg, fileToRemove);
     }
 
     private void addOrRemoveFileRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
