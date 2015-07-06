@@ -153,6 +153,7 @@ public class MainSceneController {
 
     public void handleLoadSpdxClicked(MouseEvent event) {
         File targetFile = getSpdxFileChooser().showOpenDialog(saveSpdx.getScene().getWindow());
+        if (targetFile == null) return; //Cancelled
         try {
             SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());
             this.documentToEdit = loadedDocument;

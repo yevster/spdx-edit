@@ -34,7 +34,7 @@
                     </AnchorPane>
                 </content>
             </TitledPane>
-            <TitledPane fx:id="tabRelationships" animated="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationshpis">
+            <TitledPane fx:id="tabRelationships" animated="false" expanded="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationshpis">
                 <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                   <children>
@@ -44,7 +44,7 @@
                      <Label layoutX="290.0" layoutY="14.0" text="Relationships" />
                      <ChoiceBox fx:id="chcNewRelationshipType" layoutX="290.0" layoutY="239.0" prefHeight="31.0" prefWidth="147.0" />
                      <Button fx:id="btnAddRelationship" disable="true" layoutX="443.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnAddRelationshipClick" text="Add" />
-                     <Button fx:id="btnRemoveRelationship" disable="true" layoutX="496.0" layoutY="239.0" mnemonicParsing="false" onAction="#handleBtnRemoveClick" text="Remove"/>
+                     <Button fx:id="btnRemoveRelationship" disable="true" layoutX="496.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnRemoveClick" text="Remove" />
                   </children></AnchorPane>
                 </content>
             </TitledPane>

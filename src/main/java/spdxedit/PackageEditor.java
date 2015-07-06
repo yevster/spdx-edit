@@ -2,8 +2,6 @@ package spdxedit;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
 import com.google.common.collect.Ordering;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,10 +26,8 @@ import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.util.StringableWrapper;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -148,12 +144,12 @@ public class PackageEditor {
 
         //Initialise file relationship checkbox handling
         //TODO: Could make this easier by extending the CheckBox control?
-        chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
-        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
-        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
-        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
-        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
-        chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
+        chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
+        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
+        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
+        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
+        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
+        chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
 
         //Initialize package relationship contorls
         lstTargetPackages.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> handleTargetPackageSelected(newValue1));
@@ -281,7 +277,7 @@ public class PackageEditor {
         }
     }
 
-    private void addOrRemoveRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
+    private void addOrRemoveFileRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
         if (currentFile != null) {
             SpdxLogic.setFileRelationshipToPackage(currentFile, pkg, relationshipType, shouldExist);
         }
@@ -305,6 +301,10 @@ public class PackageEditor {
     public void handleBtnRemoveClick(MouseEvent event) {
         assert (lstTargetPackages.getSelectionModel().getSelectedItems().size() > 0);
         assert (lstPackageRelationships.getSelectionModel().getSelectedItems().size() > 0);
+        StringableWrapper<RelationshipType> wrappedRelationshipType = lstPackageRelationships.getSelectionModel().getSelectedItem();
+        lstPackageRelationships.getItems().remove(wrappedRelationshipType);
+        SpdxLogic.removeRelationship(pkg, wrappedRelationshipType.getValue(), lstTargetPackages.getSelectionModel().getSelectedItem());
+
     }
 
     private void handleTargetPackageSelected(SpdxPackage pkg){

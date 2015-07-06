@@ -28,7 +28,9 @@ public class StringableWrapper<T>{
 
     @Override
     public boolean equals(Object obj) {
-        return Objects.equals(value, obj);
+        return obj != null &&
+                obj instanceof StringableWrapper &&
+                Objects.equals(getValue(), ((StringableWrapper)obj).getValue());
     }
 
     @Override
