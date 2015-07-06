@@ -16,6 +16,8 @@ import javafx.stage.Window;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.controlsfx.control.CheckListView;
+import org.controlsfx.control.PropertySheet;
+import org.controlsfx.property.BeanPropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -54,6 +56,17 @@ public class PackageEditor {
 
     @FXML
     private Button btnDeleteFileFromPackage;
+
+    /**
+     * Package properties
+     */
+
+
+    @FXML
+    private TitledPane tabPackageProperties;
+
+    @FXML
+    private PropertySheet pkgPropertySheet;
 
     /***
      * FILE INFORMATION REPRESENTATIONS
@@ -124,12 +137,16 @@ public class PackageEditor {
     @FXML
     private void initialize() {
         assert tabFiles != null : "fx:id=\"tabFiles\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert tabPackageProperties != null : "fx:id=\"tabPackageProperties\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+
         assert filesTable != null : "fx:id=\"filesTable\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert tblColumnFile != null : "fx:id=\"tblColumnFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkListFileTypes != null : "fx:id=\"chkListFileTypes\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert tabRelationships != null : "fx:id=\"tabRelationships\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnOk != null : "fx:id=\"btnOk\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnDeleteFileFromPackage != null : "fx:id=\"btnDeleteFileFromPackage\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
 
 
         //File relationship checkboxes
@@ -139,14 +156,6 @@ public class PackageEditor {
         assert chkOptionalComponent != null : "fx:id=\"chkOptionalComponent\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkMetafile != null : "fx:id=\"chkMetafile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkBuildTool != null : "fx:id=\"chkBuildTool\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-
-        //Package relationship controls
-        assert lstTargetPackages != null : "fx:id=\"lstTargetPackages\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-        assert chcNewRelationshipType != null : "fx:id=\"chcNewRelationshipType\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-        assert btnAddRelationship != null : "fx:id=\"btnAddRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-        assert btnRemoveRelationship != null : "fx:id=\"btnRemoveRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-
-
         //Initialise file relationship checkbox handling
         //TODO: Could make this easier by extending the CheckBox control?
         chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
@@ -156,7 +165,20 @@ public class PackageEditor {
         chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
         chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
 
-        //Initialize package relationship contorls
+        //Package relationship controls
+        assert lstTargetPackages != null : "fx:id=\"lstTargetPackages\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chcNewRelationshipType != null : "fx:id=\"chcNewRelationshipType\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnAddRelationship != null : "fx:id=\"btnAddRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnRemoveRelationship != null : "fx:id=\"btnRemoveRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+
+        //Package properties
+        assert pkgPropertySheet != null : "fx:id=\"pkgPropertySheet\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        pkgPropertySheet.setSearchBoxVisible(false);
+        pkgPropertySheet.setMode(PropertySheet.Mode.NAME);
+        pkgPropertySheet.setModeSwitcherVisible(false);
+
+        //Initialize package relationship controls
         lstTargetPackages.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> handleTargetPackageSelected(newValue1));
         lstTargetPackages.setCellFactory(listView -> new MainSceneController.SpdxPackageListCell());
         lstPackageRelationships.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> btnRemoveRelationship.setDisable(newValue1 == null));
@@ -220,7 +242,9 @@ public class PackageEditor {
                 } catch (InvalidSPDXAnalysisException e) {
                     logger.error("Unable to get files for package " + pkg.getName(), e);
                 }
-                packageEditor.tabFiles.setExpanded(true);
+                packageEditor.pkgPropertySheet.getItems().setAll(BeanPropertyUtils.getProperties(pkg, propertyDescriptor ->
+                        SpdxLogic.EDITABLE_PACKAGE_PROPERTIES.contains(propertyDescriptor.getName())));
+                packageEditor.tabPackageProperties.setExpanded(true);
             });
 
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.

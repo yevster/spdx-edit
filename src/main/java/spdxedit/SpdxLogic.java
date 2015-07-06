@@ -282,5 +282,8 @@ public class SpdxLogic {
             throw new RuntimeException(e);
         }
     }
+
+
+    static final Set<String> EDITABLE_PACKAGE_PROPERTIES = ImmutableSet.of("description", "downloadLocation", "homepage", "originator", "packageFileName", "summary", "supplier", "versionInfo");
 }
 
