@@ -17,6 +17,7 @@ import org.spdx.rdfparser.model.SpdxPackage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class NewPackageDialog {
 
@@ -38,13 +39,16 @@ public class NewPackageDialog {
     private CheckBox chkOmitHiddenFiles;
 
     @FXML
+    private CheckBox chkRemotePackage;
+
+    @FXML
     private TextArea comment;
 
     private Path path;
 
     private Window parentWindow;
 
-    public static SpdxPackage createPackageWithPrompt(Window parentWindow, Path path) {
+    public static SpdxPackage createPackageWithPrompt(Window parentWindow, Optional<Path> path) {
         final NewPackageDialog controller = new NewPackageDialog(path);
         final Stage dialogStage = new Stage();
         dialogStage.setTitle("Create SPDX Package");
@@ -63,12 +67,21 @@ public class NewPackageDialog {
                 Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().forEachOrdered(
                         id -> controller.licenseSelection.getItems().add(id)
                 );
-                controller.name.setText(path.getFileName().toString());
+                if (path.isPresent()) {
+                    controller.name.setText(path.get().getFileName().toString());
+                }
                 controller.licenseSelection.getSelectionModel().selectFirst();
 
             });
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
             controller.ok.setOnMouseClicked(event -> dialogStage.close());
+            if (!path.isPresent()){//No path provided. Must be remote.
+                controller.chkRemotePackage.setSelected(true);
+                controller.chkRemotePackage.setDisable(true);
+                controller.chkOmitHiddenFiles.setSelected(false);
+                controller.chkOmitHiddenFiles.setDisable(true);
+            }
+
             dialogStage.showAndWait();
             return controller.createSpdxPackageFromInputs();
 
@@ -77,8 +90,8 @@ public class NewPackageDialog {
         }
     }
 
-    private NewPackageDialog(Path path) {
-        this.path = path;
+    private NewPackageDialog(Optional<Path> path) {
+        this.path = path.orElse(null);
     }
 
     @FXML
@@ -89,12 +102,14 @@ public class NewPackageDialog {
         assert licenseSelection != null : "fx:id=\"licenseSelection\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert comment != null : "fx:id=\"comment\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert chkOmitHiddenFiles != null : "fx:id=\"chkOmitHiddenFiles\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
+        assert chkRemotePackage != null : "fx:id=\"chkRemotePackage\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
 
     }
 
 
     private SpdxPackage createSpdxPackageFromInputs() {
-        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(), name.getText(), comment.getText(), chkOmitHiddenFiles.isSelected());
+        Optional<Path> pathForPackage = chkRemotePackage.isSelected() ? Optional.empty() : Optional.of(this.path);
+        return SpdxLogic.createSpdxPackageForPath(pathForPackage, licenseSelection.getValue(), name.getText(), comment.getText(), chkOmitHiddenFiles.isSelected());
     }
 
 

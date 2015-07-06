@@ -80,7 +80,17 @@ public class SpdxLogic {
         }
     }
 
-    public static SpdxPackage createSpdxPackageForPath(Path pkgRootPath, String licenseId, String name, String comment, final boolean omitHiddenFiles) {
+    /**
+     * Creates a new package with the specified license, name, comment, and root path.
+     *
+     * @param pkgRootPath     The path from which the files will be included into the package. If absent, creates a "remote" package, i.e. one without files, just referencing a remote dependency.
+     * @param licenseId
+     * @param name
+     * @param comment
+     * @param omitHiddenFiles
+     * @return
+     */
+    public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, String licenseId, String name, String comment, final boolean omitHiddenFiles) {
         Objects.requireNonNull(pkgRootPath);
         try {
             AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseId);
@@ -94,49 +104,50 @@ public class SpdxLogic {
                     new SpdxPackageVerificationCode(name, new String[]{}));
             pkg.setComment(comment);
 
-
-            //Add files in path
-            List<SpdxFile> addedFiles = new LinkedList<>();
-            String baseUri = pkgRootPath.toUri().toString();
-            FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
-                @Override
-                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                    if (omitHiddenFiles && dir.getFileName().toString().startsWith(".")) {
-                        return FileVisitResult.SKIP_SUBTREE;
-                    } else return FileVisitResult.CONTINUE;
-                }
-
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    //Skip if omitHidden is set and this file is hidden.
-                    if (omitHiddenFiles && (file.getFileName().toString().startsWith(".") || Files.isHidden(file)))
-                        return FileVisitResult.CONTINUE;
-                    try {
-                        String checksum = getChecksumForFile(file);
-                        FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
-                        String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
-                        SpdxFile addedFile = new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
-                        addedFiles.add(addedFile);
-                    } catch (InvalidSPDXAnalysisException e) {
-                        throw new RuntimeException(e);
+            if (pkgRootPath.isPresent()) {
+                //Add files in path
+                List<SpdxFile> addedFiles = new LinkedList<>();
+                String baseUri = pkgRootPath.get().toUri().toString();
+                FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                        if (omitHiddenFiles && dir.getFileName().toString().startsWith(".")) {
+                            return FileVisitResult.SKIP_SUBTREE;
+                        } else return FileVisitResult.CONTINUE;
                     }
-                    return FileVisitResult.CONTINUE;
-                }
 
-                @Override
-                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                    logger.error("Unable to add file ", file.toAbsolutePath().toString());
-                    return FileVisitResult.CONTINUE;
-                }
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        //Skip if omitHidden is set and this file is hidden.
+                        if (omitHiddenFiles && (file.getFileName().toString().startsWith(".") || Files.isHidden(file)))
+                            return FileVisitResult.CONTINUE;
+                        try {
+                            String checksum = getChecksumForFile(file);
+                            FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
+                            String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
+                            SpdxFile addedFile = new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
+                            addedFiles.add(addedFile);
+                        } catch (InvalidSPDXAnalysisException e) {
+                            throw new RuntimeException(e);
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    return FileVisitResult.CONTINUE;
-                }
-            };
-            Files.walkFileTree(pkgRootPath, fileVisitor);
-            SpdxFile[] files = addedFiles.stream().toArray(size -> new SpdxFile[size]);
-            pkg.setFiles(files);
+                    @Override
+                    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                        logger.error("Unable to add file ", file.toAbsolutePath().toString());
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                        return FileVisitResult.CONTINUE;
+                    }
+                };
+                Files.walkFileTree(pkgRootPath.get(), fileVisitor);
+                SpdxFile[] files = addedFiles.stream().toArray(size -> new SpdxFile[size]);
+                pkg.setFiles(files);
+            }
             return pkg;
         } catch (InvalidSPDXAnalysisException | IOException e) {
             throw new RuntimeException(e);
@@ -272,18 +283,19 @@ public class SpdxLogic {
         }
     }
 
-    public static void removeFileFromPackage(SpdxPackage pkg, SpdxFile fileToRemove){
+    public static void removeFileFromPackage(SpdxPackage pkg, SpdxFile fileToRemove) {
         try {
             SpdxFile[] newFiles = Arrays.stream(pkg.getFiles())
                     .filter(currentFile -> !Objects.equals(fileToRemove, currentFile))
                     .toArray(size -> new SpdxFile[size]);
             pkg.setFiles(newFiles);
-        } catch (InvalidSPDXAnalysisException e){
+        } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-    static final Set<String> EDITABLE_PACKAGE_PROPERTIES = ImmutableSet.of("description", "downloadLocation", "homepage", "originator", "packageFileName", "summary", "supplier", "versionInfo");
+    //Properties of a package that can be edited on the properties tab.
+    //TODO: Create editors, pretty names, etc.
+    static final Set<String> EDITABLE_PACKAGE_PROPERTIES = ImmutableSet.of("description", "downloadLocation", "packageFileName", "homepage", "originator", "packageFileName", "summary", "supplier", "versionInfo", "comment");
 }
 

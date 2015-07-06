@@ -35,7 +35,7 @@ public class MainSceneController {
     private Button chooseDir;
 
     @FXML
-    private Button addPackage;
+    private Button btnAddPackage;
 
     @FXML
     private Button saveSpdx;
@@ -82,7 +82,7 @@ public class MainSceneController {
     void initialize() {
         assert dirTree != null : "fx:id=\"dirTree\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert chooseDir != null : "fx:id=\"chooseDir\" was not injected: check your FXML file 'MainScene.fxml'.";
-        assert addPackage != null : "fx:id=\"addPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert btnAddPackage != null : "fx:id=\"btnAddPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert saveSpdx != null : "fx:id=\"saveSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert addedPackagesUiList != null : "fx:id=\"addedPackagesUiList\" was not injected: check your FXML file 'MainScene.fxml'.";
         addedPackagesUiList.setCellFactory(param -> new SpdxPackageListCell());
@@ -141,8 +141,8 @@ public class MainSceneController {
     public void handleAddPackageClicked(MouseEvent event) {
         List<TreeItem<Path>> selectedNodes = dirTree.getSelectionModel().getSelectedItems();
         assert (selectedNodes.size() <= 1);
-        Path path = selectedNodes.get(0).getValue();
-        SpdxPackage newPackage = NewPackageDialog.createPackageWithPrompt(addPackage.getScene().getWindow(), path);
+        Optional<Path> path = selectedNodes.size() > 0 ? Optional.of(selectedNodes.get(0).getValue()) : Optional.empty();
+        SpdxPackage newPackage = NewPackageDialog.createPackageWithPrompt(btnAddPackage.getScene().getWindow(), path);
         SpdxLogic.addPackageToDocument(this.documentToEdit, newPackage);
         addedPackagesUiList.getItems().add(newPackage);
         if (addedPackagesUiList.getSelectionModel().getSelectedItem() == null) {
@@ -181,7 +181,7 @@ public class MainSceneController {
     }
 
     public void handleDirectoryTreeClicked(MouseEvent event) {
-        addPackage.setDisable(dirTree.getSelectionModel().isEmpty());
+        btnAddPackage.setDisable(dirTree.getSelectionModel().isEmpty());
     }
 
 }

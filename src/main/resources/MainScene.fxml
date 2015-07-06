@@ -19,7 +19,7 @@
             <children>
                 <Button fx:id="chooseDir" layoutX="14.0" layoutY="25.0" mnemonicParsing="false"
                         onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..."/>
-                <Button fx:id="addPackage" disable="true" layoutX="14.0" layoutY="75.0" mnemonicParsing="false"
+                <Button fx:id="btnAddPackage" layoutX="14.0" layoutY="75.0" mnemonicParsing="false"
                         onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0"
                         text="Add Package"/>
                 <Button fx:id="saveSpdx" layoutX="14.0" layoutY="125.0" mnemonicParsing="false"
