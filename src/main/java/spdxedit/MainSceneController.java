@@ -142,7 +142,7 @@ public class MainSceneController {
         List<TreeItem<Path>> selectedNodes = dirTree.getSelectionModel().getSelectedItems();
         assert (selectedNodes.size() <= 1);
         Path path = selectedNodes.get(0).getValue();
-        SpdxPackage newPackage = PackagePropsSceneController.createPackageWithPrompt(addPackage.getScene().getWindow(), path);
+        SpdxPackage newPackage = NewPackageDialog.createPackageWithPrompt(addPackage.getScene().getWindow(), path);
         SpdxLogic.addPackageToDocument(this.documentToEdit, newPackage);
         addedPackagesUiList.getItems().add(newPackage);
         if (addedPackagesUiList.getSelectionModel().getSelectedItem() == null) {

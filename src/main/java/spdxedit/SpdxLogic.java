@@ -108,6 +108,9 @@ public class SpdxLogic {
 
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    //Skip if omitHidden is set and this file is hidden.
+                    if (omitHiddenFiles && (file.getFileName().toString().startsWith(".") || Files.isHidden(file)))
+                        return FileVisitResult.CONTINUE;
                     try {
                         String checksum = getChecksumForFile(file);
                         FileType[] fileTypes = SpdxLogic.getTypesForFile(file);

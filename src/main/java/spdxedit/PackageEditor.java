@@ -203,7 +203,7 @@ public class PackageEditor {
         dialogStage.setY(parentWindow.getY() + parentWindow.getHeight() / 2);
         dialogStage.setResizable(false);
         try {
-            FXMLLoader loader = new FXMLLoader(PackagePropsSceneController.class.getResource("/PackageEditor.fxml"));
+            FXMLLoader loader = new FXMLLoader(NewPackageDialog.class.getResource("/PackageEditor.fxml"));
             loader.setController(packageEditor);
             Pane pane = loader.load();
             Scene scene = new Scene(pane);
