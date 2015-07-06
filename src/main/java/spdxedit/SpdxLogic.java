@@ -97,6 +97,7 @@ public class SpdxLogic {
 
             //Add files in path
             List<SpdxFile> addedFiles = new LinkedList<>();
+            String baseUri = pkgRootPath.toUri().toString();
             FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
@@ -110,7 +111,8 @@ public class SpdxLogic {
                     try {
                         String checksum = getChecksumForFile(file);
                         FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
-                        SpdxFile addedFile = new SpdxFile(file.toUri().getPath().toString(), fileTypes, checksum, null, null, null, null, null, null);
+                        String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
+                        SpdxFile addedFile = new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
                         addedFiles.add(addedFile);
                     } catch (InvalidSPDXAnalysisException e) {
                         throw new RuntimeException(e);
