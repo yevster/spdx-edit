@@ -3,10 +3,7 @@ package spdxedit;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,6 +35,9 @@ public class PackagePropsSceneController {
     private ComboBox<String> licenseSelection;
 
     @FXML
+    private CheckBox chkOmitHiddenFiles;
+
+    @FXML
     private TextArea comment;
 
     private Path path;
@@ -53,7 +53,7 @@ public class PackagePropsSceneController {
         dialogStage.setY(parentWindow.getX() + parentWindow.getWidth() / 2);
         dialogStage.setY(parentWindow.getY() + parentWindow.getHeight() / 2);
         try {
-            FXMLLoader loader = new FXMLLoader(PackagePropsSceneController.class.getResource("/PackagePropsScene.fxml"));
+            FXMLLoader loader = new FXMLLoader(PackagePropsSceneController.class.getResource("/NewPackageOptions.fxml"));
             loader.setController(controller);
             Pane pane = loader.load();
             Scene scene = new Scene(pane);
@@ -81,9 +81,20 @@ public class PackagePropsSceneController {
         this.path = path;
     }
 
+    @FXML
+    void initialize() {
+        assert ok != null : "fx:id=\"ok\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+        assert cancel != null : "fx:id=\"cancel\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+        assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+        assert licenseSelection != null : "fx:id=\"licenseSelection\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+        assert comment != null : "fx:id=\"comment\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+        assert chkOmitHiddenFiles != null : "fx:id=\"chkOmitHiddenFiles\" was not injected: check your FXML file 'NewPackageOptions.fxml'.";
+
+    }
+
 
     private SpdxPackage createSpdxPackageFromInputs() {
-        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(), name.getText(), comment.getText());
+        return SpdxLogic.createSpdxPackageForPath(this.path, licenseSelection.getValue(), name.getText(), comment.getText(), chkOmitHiddenFiles.isSelected());
     }
 
 

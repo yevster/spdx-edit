@@ -7,33 +7,11 @@
 <?import org.controlsfx.control.ButtonBar?>
 <?import org.controlsfx.control.CheckListView?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="823.0" xmlns="http://javafx.com/javafx/8.0.45" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="478.0" prefWidth="937.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
 
 
-    <Accordion maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="421.0" prefWidth="823.0">
+    <Accordion maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="424.0" prefWidth="937.0">
         <panes>
-            <TitledPane fx:id="tabFiles" text="Files">
-                <content>
-                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                        <children>
-                            <TreeTableView fx:id="filesTable" prefHeight="354.0" prefWidth="299.0">
-                                <columns>
-                                    <TreeTableColumn fx:id="tblColumnFile" prefWidth="297.0" />
-                                </columns>
-                            </TreeTableView>
-                     <CheckListView fx:id="chkListFileTypes" layoutX="459.0" layoutY="38.0" prefHeight="320.0" prefWidth="264.0" AnchorPane.bottomAnchor="12.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="26.0" />
-                     <CheckBox fx:id="chkDataFile" layoutX="326.0" layoutY="57.0" mnemonicParsing="false" text="Data File" />
-                     <Label layoutX="534.0" layoutY="14.0" text="File Types:" />
-                     <CheckBox fx:id="chkTestCase" layoutX="326.0" layoutY="97.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="103.0" text="Test Case" />
-                     <CheckBox fx:id="chkBuildTool" layoutX="326.0" layoutY="137.0" mnemonicParsing="false" text="Build Tool" />
-                     <CheckBox fx:id="chkDocumentation" layoutX="326.0" layoutY="177.0" mnemonicParsing="false" text="Documentation" />
-                     <CheckBox fx:id="chkOptionalComponent" layoutX="326.0" layoutY="217.0" mnemonicParsing="false" text="Optional Component" />
-                     <CheckBox fx:id="chkMetafile" layoutX="326.0" layoutY="257.0" mnemonicParsing="false" text="Metafile" />
-                     <Label layoutX="326.0" layoutY="14.0" text="Relationship to package:" />
-                        </children>
-                    </AnchorPane>
-                </content>
-            </TitledPane>
             <TitledPane fx:id="tabRelationships" animated="false" expanded="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationshpis">
                 <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
@@ -48,9 +26,31 @@
                   </children></AnchorPane>
                 </content>
             </TitledPane>
+            <TitledPane fx:id="tabFiles" text="Files">
+                <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                        <children>
+                            <TreeTableView fx:id="filesTable" layoutX="20.4" layoutY="21.4" prefHeight="350.0" prefWidth="523.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <columns>
+                                    <TreeTableColumn fx:id="tblColumnFile" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="523.0" />
+                                </columns>
+                            </TreeTableView>
+                     <CheckListView fx:id="chkListFileTypes" layoutX="459.0" layoutY="47.4" prefHeight="309.0" prefWidth="182.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="30.0" />
+                     <CheckBox fx:id="chkDataFile" layoutX="561.0" layoutY="57.0" mnemonicParsing="false" text="Data File" />
+                     <Label layoutX="728.0" layoutY="14.0" text="File Types:" />
+                     <CheckBox fx:id="chkTestCase" layoutX="561.0" layoutY="97.0" mnemonicParsing="false" prefHeight="21.0" prefWidth="103.0" text="Test Case" />
+                     <CheckBox fx:id="chkBuildTool" layoutX="561.0" layoutY="137.0" mnemonicParsing="false" text="Build Tool" />
+                     <CheckBox fx:id="chkDocumentation" layoutX="561.0" layoutY="177.0" mnemonicParsing="false" text="Documentation" />
+                     <CheckBox fx:id="chkOptionalComponent" layoutX="561.0" layoutY="217.0" mnemonicParsing="false" text="Optional Component" />
+                     <CheckBox fx:id="chkMetafile" layoutX="561.0" layoutY="257.0" mnemonicParsing="false" text="Metafile" />
+                     <Label layoutX="561.0" layoutY="14.0" text="Relationship to package:" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </TitledPane>
         </panes>
     </Accordion>
     <ButtonBar layoutX="409.0" layoutY="414.0" maxWidth="1.7976931348623157E308" prefHeight="40.0" />
-    <Button fx:id="btnOk" defaultButton="true" layoutX="757.0" layoutY="434.0" mnemonicParsing="false" text="OK" />
+    <Button fx:id="btnOk" defaultButton="true" layoutX="879.0" layoutY="434.0" mnemonicParsing="false" text="OK" />
 
 </Pane>

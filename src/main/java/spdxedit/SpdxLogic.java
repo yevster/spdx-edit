@@ -19,9 +19,8 @@ import org.spdx.rdfparser.model.SpdxFile.FileType;
 
 import javax.management.relation.Relation;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,7 +45,7 @@ public class SpdxLogic {
 
     }
 
-    public static void addPackageToDocument(SpdxDocument document, SpdxPackage pkg){
+    public static void addPackageToDocument(SpdxDocument document, SpdxPackage pkg) {
         try {
             pkg.addRelationship(new Relationship(document, RelationshipType.relationshipType_describedBy, null));
             document.addRelationship(new Relationship(pkg, RelationshipType.relationshipType_describes, null));
@@ -58,10 +57,10 @@ public class SpdxLogic {
     }
 
 
-    public static Stream<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document){
+    public static Stream<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document) {
         return Arrays.stream(document.getRelationships())
                 .filter(relationship -> relationship.getRelationshipType() == RelationshipType.relationshipType_describes)
-                //Just in case
+                        //Just in case
                 .filter(relationship -> relationship.getRelatedSpdxElement() instanceof SpdxPackage)
                 .map(relationship -> (SpdxPackage) relationship.getRelatedSpdxElement());
     }
@@ -81,8 +80,8 @@ public class SpdxLogic {
         }
     }
 
-    public static SpdxPackage createSpdxPackageForPath(Path path, String licenseId, String name, String comment) {
-        Objects.requireNonNull(path);
+    public static SpdxPackage createSpdxPackageForPath(Path pkgRootPath, String licenseId, String name, String comment, final boolean omitHiddenFiles) {
+        Objects.requireNonNull(pkgRootPath);
         try {
             AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseId);
 
@@ -95,25 +94,43 @@ public class SpdxLogic {
                     new SpdxPackageVerificationCode(name, new String[]{}));
             pkg.setComment(comment);
 
-            //Add files in path
 
-            SpdxFile[] files = Files.walk(path)
-                    .filter(path1 -> !Files.isDirectory(path1))
-                    .map(path2 -> {
-                        FileType[] fileTypes = getTypesForFile(path2);
-                        try {
-                            String checksum = getChecksumForFile(path2);
-                            SpdxFile addedFile = new SpdxFile(path2.getFileName().toString(), fileTypes, checksum, null, null, null, null, null, null);
-                            return addedFile;
-                        } catch (IOException ioe) {
-                            logger.error("Unable to get checksum for file " + path.toAbsolutePath().toString() + ". File omitted from package.");
-                            return null; //To be filtered downstream
-                        } catch (InvalidSPDXAnalysisException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .filter(file1 -> file1 != null)
-                    .toArray(SpdxFile[]::new);
+            //Add files in path
+            List<SpdxFile> addedFiles = new LinkedList<>();
+            FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    if (omitHiddenFiles && dir.getFileName().toString().startsWith(".")) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    } else return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    try {
+                        String checksum = getChecksumForFile(file);
+                        FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
+                        SpdxFile addedFile = new SpdxFile(file.toUri().getPath().toString(), fileTypes, checksum, null, null, null, null, null, null);
+                        addedFiles.add(addedFile);
+                    } catch (InvalidSPDXAnalysisException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                    logger.error("Unable to add file ", file.toAbsolutePath().toString());
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    return FileVisitResult.CONTINUE;
+                }
+            };
+            Files.walkFileTree(pkgRootPath, fileVisitor);
+            SpdxFile[] files = addedFiles.stream().toArray(size -> new SpdxFile[size]);
             pkg.setFiles(files);
             return pkg;
         } catch (InvalidSPDXAnalysisException | IOException e) {
@@ -184,7 +201,7 @@ public class SpdxLogic {
         return WordUtils.capitalize(StringUtils.lowerCase(fileType.getTag()));
     }
 
-    public static String toString(RelationshipType relationshipType){
+    public static String toString(RelationshipType relationshipType) {
         Objects.requireNonNull(relationshipType);
         return WordUtils.capitalize(StringUtils.lowerCase(StringUtils.replace(relationshipType.getTag(), "_", " ")));
     }
@@ -207,7 +224,7 @@ public class SpdxLogic {
 
     }
 
-    public static void removeRelationship(SpdxElement source, RelationshipType relationshipType, SpdxElement target){
+    public static void removeRelationship(SpdxElement source, RelationshipType relationshipType, SpdxElement target) {
         try {
             Objects.requireNonNull(target);
             Relationship[] newRelationships = Arrays.stream(source.getRelationships())
@@ -215,7 +232,7 @@ public class SpdxLogic {
                     .filter(relationship -> relationship.getRelationshipType() != relationshipType && !Objects.equals(relationship.getRelatedSpdxElement(), target))
                     .toArray(size -> new Relationship[size]);
             source.setRelationships(newRelationships);
-        } catch (InvalidSPDXAnalysisException e){
+        } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException("Illegal SPDX", e); //Never should happen
         }
     }
