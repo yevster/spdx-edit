@@ -15,6 +15,7 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
@@ -30,6 +31,7 @@ import spdxedit.util.StringableWrapper;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -244,13 +246,16 @@ public class PackageEditor {
                     TreeItem<SpdxFile> root = new TreeItem<>(dummyfile);
                     packageEditor.filesTable.setRoot(root);
 
-                    root.getChildren().setAll(Stream.of(pkg.getFiles()).map(TreeItem<SpdxFile>::new).collect(Collectors.toList()));
+                    root.getChildren().setAll(Stream.of(pkg.getFiles())
+                            .sorted(Comparator.comparing(file -> StringUtils.lowerCase(file.getName()))) //Sort by file name
+                            .map(TreeItem<SpdxFile>::new)
+                            .collect(Collectors.toList()));
                 } catch (InvalidSPDXAnalysisException e) {
                     logger.error("Unable to get files for package " + pkg.getName(), e);
                 }
                 packageEditor.pkgPropertySheet.getItems().setAll(BeanPropertyUtils.getProperties(pkg, propertyDescriptor ->
                         SpdxLogic.EDITABLE_PACKAGE_PROPERTIES.contains(propertyDescriptor.getName())));
-                packageEditor.tabPackageProperties.setExpanded(true);
+                packageEditor.tabFiles.setExpanded(true);
             });
 
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
