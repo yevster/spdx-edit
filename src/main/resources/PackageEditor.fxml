@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import org.controlsfx.control.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import org.controlsfx.control.ButtonBar?>
 <?import org.controlsfx.control.CheckListView?>
-
+<?import org.controlsfx.control.PropertySheet?>
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="558.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
 
 
@@ -31,7 +28,7 @@
                      <Label layoutX="290.0" layoutY="14.0" text="Relationships" />
                      <ChoiceBox fx:id="chcNewRelationshipType" layoutX="290.0" layoutY="239.0" prefHeight="31.0" prefWidth="147.0" />
                      <Button fx:id="btnAddRelationship" disable="true" layoutX="443.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnAddRelationshipClick" text="Add" />
-                     <Button fx:id="btnRemoveRelationship" disable="true" layoutX="496.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnRemoveClick" text="Remove" />
+                     <Button fx:id="btnRemoveRelationship" disable="true" layoutX="496.0" layoutY="239.0" mnemonicParsing="false" onMouseClicked="#handleBtnRemoveRelationshipClick" text="Remove" />
                   </children></AnchorPane>
                 </content>
             </TitledPane>

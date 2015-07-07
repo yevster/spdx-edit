@@ -131,6 +131,8 @@ public class MainSceneController {
 
     public void handleSaveSpdxClicked(MouseEvent event) {
         File targetFile = getSpdxFileChooser().showSaveDialog(saveSpdx.getScene().getWindow());
+        if (targetFile == null) //Dialog cancelled
+            return;
         try (FileWriter writer = new FileWriter(targetFile)) {
             this.documentToEdit.getDocumentContainer().getModel().write(writer);
         } catch (IOException e) {

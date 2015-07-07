@@ -221,7 +221,12 @@ public class PackageEditor {
 
     }
 
-
+    /**
+     * Opens the modal package editor for the provided package.
+     * @param pkg The package to edit.
+     * @param relatablePackages Packages to which the edited package may optionally have defined relationships
+     * @param parentWindow The parent window.
+     */
     public static void editPackage(final SpdxPackage pkg, final List<SpdxPackage> relatablePackages, Window parentWindow) {
 
         final PackageEditor packageEditor = new PackageEditor(pkg, relatablePackages);
@@ -259,7 +264,7 @@ public class PackageEditor {
             });
 
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
-            packageEditor.btnOk.setOnMouseClicked(event2 -> dialogStage.close());
+            packageEditor.btnOk.setOnMouseClicked(event -> dialogStage.close());
             dialogStage.showAndWait();
 
 
@@ -349,7 +354,7 @@ public class PackageEditor {
         }
     }
 
-    public void handleBtnRemoveClick(MouseEvent event) {
+    public void handleBtnRemoveRelationshipClick(MouseEvent event) {
         assert (lstTargetPackages.getSelectionModel().getSelectedItems().size() > 0);
         assert (lstPackageRelationships.getSelectionModel().getSelectedItems().size() > 0);
         StringableWrapper<RelationshipType> wrappedRelationshipType = lstPackageRelationships.getSelectionModel().getSelectedItem();
