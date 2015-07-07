@@ -93,6 +93,9 @@ public class PackageEditor {
     @FXML
     private CheckBox chkBuildTool;
 
+    @FXML
+    private CheckBox chkExcludeFile;
+
     /**
      * PACKAGE RELATIONSHIP REPRESENTATIONS
      **/
@@ -156,6 +159,8 @@ public class PackageEditor {
         assert chkOptionalComponent != null : "fx:id=\"chkOptionalComponent\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkMetafile != null : "fx:id=\"chkMetafile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkBuildTool != null : "fx:id=\"chkBuildTool\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert chkExcludeFile != null : "fx:id=\"chkExcludeFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
         //Initialise file relationship checkbox handling
         //TODO: Could make this easier by extending the CheckBox control?
         chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
@@ -164,6 +169,7 @@ public class PackageEditor {
         chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
         chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
         chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
+        chkExcludeFile.selectedProperty().addListener((observable, oldValue, newValue) -> handleChkExcludeFileChange(newValue));
 
         //Package relationship controls
         assert lstTargetPackages != null : "fx:id=\"lstTargetPackages\" was not injected: check your FXML file 'PackageEditor.fxml'.";
@@ -290,6 +296,8 @@ public class PackageEditor {
             chkOptionalComponent.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_optionalComponentOf, pkg).isPresent());
             chkBuildTool.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_buildToolOf, pkg).isPresent());
 
+            chkExcludeFile.setSelected(SpdxLogic.isFileExcludedFromVerification(pkg, newSelection.getValue()));
+
             //Set the file relationship checkboxes
             Relationship[] relationships = newSelection.getValue().getRelationships();
 
@@ -354,6 +362,16 @@ public class PackageEditor {
                 .collect(Collectors.toList());
         lstPackageRelationships.getItems().setAll(relationshipTypes);
         btnAddRelationship.setDisable(pkg == null);
+    }
+
+    private void handleChkExcludeFileChange(boolean newValue){
+        if (currentFile != null){
+            if (newValue){
+                SpdxLogic.excludeFileFromVerification(pkg, currentFile);
+            } else {
+                SpdxLogic.unexcludeFileFromVerification(pkg, currentFile);
+            }
+        }
     }
 
 }

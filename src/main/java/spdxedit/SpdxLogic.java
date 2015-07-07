@@ -3,7 +3,9 @@ package spdxedit;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
@@ -17,7 +19,6 @@ import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 
-import javax.management.relation.Relation;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -147,6 +148,7 @@ public class SpdxLogic {
                 Files.walkFileTree(pkgRootPath.get(), fileVisitor);
                 SpdxFile[] files = addedFiles.stream().toArray(size -> new SpdxFile[size]);
                 pkg.setFiles(files);
+                recomputeVerificationCode(pkg);
             }
             return pkg;
         } catch (InvalidSPDXAnalysisException | IOException e) {
@@ -289,6 +291,7 @@ public class SpdxLogic {
                     .filter(currentFile -> !Objects.equals(fileToRemove, currentFile))
                     .toArray(size -> new SpdxFile[size]);
             pkg.setFiles(newFiles);
+            recomputeVerificationCode(pkg);
         } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException(e);
         }
@@ -297,5 +300,79 @@ public class SpdxLogic {
     //Properties of a package that can be edited on the properties tab.
     //TODO: Create editors, pretty names, etc.
     static final Set<String> EDITABLE_PACKAGE_PROPERTIES = ImmutableSet.of("description", "downloadLocation", "packageFileName", "homepage", "originator", "packageFileName", "summary", "supplier", "versionInfo", "comment");
+
+    /**
+     * Utility method to make verification code use in stream processing not suicide-inducing.
+     *
+     * @param pkg
+     * @return
+     */
+    private static SpdxPackageVerificationCode getVerificationCodeHandlingException(SpdxPackage pkg) {
+        try {
+            return pkg.getPackageVerificationCode();
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static Checksum getSha1Checksum(SpdxFile file) {
+        return Arrays.stream(file.getChecksums())
+                .filter(checksum -> checksum.getAlgorithm() == Checksum.ChecksumAlgorithm.checksumAlgorithm_sha1)
+                .findFirst().get(); //Every file must have a sha
+    }
+
+
+    //TODO: Add unit test
+    public static String computePackageVerificationCode(SpdxPackage pkg) {
+        try {
+            String combinedSha1s = Arrays.stream(pkg.getFiles())
+                    .filter(spdxFile -> ArrayUtils.contains(getVerificationCodeHandlingException(pkg).getExcludedFileNames(), spdxFile.getName())) //Filter out excluded files
+                    .map(SpdxLogic::getSha1Checksum) //Get sha1 checksum for each file
+                    .map(Checksum::getValue) //Get the string value of the checksum
+                    .sorted() //Sort them
+                    .collect(Collectors.joining()) //Combine them into a single string
+                    ;
+            String result = new String(Hex.encodeHex(MessageDigest.getInstance("SHA1").digest(Hex.decodeHex(combinedSha1s.toCharArray()))));
+            return result;
+
+        } catch (InvalidSPDXAnalysisException | NoSuchAlgorithmException | DecoderException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void recomputeVerificationCode(SpdxPackage pkg) {
+        try {
+            pkg.getPackageVerificationCode().setValue(computePackageVerificationCode(pkg));
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void excludeFileFromVerification(SpdxPackage pkg, SpdxFile file) {
+        try {
+            if (!ArrayUtils.contains(pkg.getPackageVerificationCode().getExcludedFileNames(), file.getName()))
+                pkg.getPackageVerificationCode().addExcludedFileName(file.getName());
+            recomputeVerificationCode(pkg);
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void unexcludeFileFromVerification(SpdxPackage pkg, SpdxFile file) {
+        try {
+            ArrayUtils.removeElement(pkg.getPackageVerificationCode().getExcludedFileNames(), file.getName());
+            recomputeVerificationCode(pkg);
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean isFileExcludedFromVerification(SpdxPackage pkg, SpdxFile file) {
+        try {
+            return ArrayUtils.contains(pkg.getPackageVerificationCode().getExcludedFileNames(), file.getName());
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 
