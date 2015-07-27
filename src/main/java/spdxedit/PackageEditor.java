@@ -1,5 +1,7 @@
 package spdxedit;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import com.google.common.collect.Ordering;
 import javafx.collections.ListChangeListener;
@@ -13,12 +15,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
+import org.controlsfx.property.editor.Editors;
+import org.controlsfx.property.editor.PropertyEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -113,6 +118,7 @@ public class PackageEditor {
     @FXML
     private Button btnRemoveRelationship;
 
+
     @FXML
     private ListView<StringableWrapper<RelationshipType>> lstPackageRelationships;
 
@@ -153,7 +159,6 @@ public class PackageEditor {
         assert btnDeleteFileFromPackage != null : "fx:id=\"btnDeleteFileFromPackage\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
 
-
         //File relationship checkboxes
         assert chkDataFile != null : "fx:id=\"chkDataFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert chkTestCase != null : "fx:id=\"chkTestCase\" was not injected: check your FXML file 'PackageEditor.fxml'.";
@@ -186,6 +191,7 @@ public class PackageEditor {
         pkgPropertySheet.setMode(PropertySheet.Mode.NAME);
         pkgPropertySheet.setModeSwitcherVisible(false);
 
+
         //Initialize package relationship controls
         lstTargetPackages.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> handleTargetPackageSelected(newValue1));
         lstTargetPackages.setCellFactory(listView -> new MainSceneController.SpdxPackageListCell());
@@ -202,7 +208,7 @@ public class PackageEditor {
                         RelationshipType.relationshipType_other)
                         .collect(Collectors.toList()));
         chcNewRelationshipType.getSelectionModel().selectFirst();
-         assert (otherPackages != null); //Constructor finished executing
+        assert (otherPackages != null); //Constructor finished executing
         lstTargetPackages.getItems().setAll(otherPackages);
 
         //Initialize other elements
@@ -216,6 +222,7 @@ public class PackageEditor {
                 .collect(Collectors.toList()));
         chkListFileTypes.getCheckModel().getCheckedItems().addListener(this::handleFileTypeCheckedOrUnchecked);
         filesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFileSelected(newValue));
+        filesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         filesTable.setShowRoot(false);
 
 
@@ -223,15 +230,16 @@ public class PackageEditor {
 
     /**
      * Opens the modal package editor for the provided package.
-     * @param pkg The package to edit.
+     *
+     * @param pkg               The package to edit.
      * @param relatablePackages Packages to which the edited package may optionally have defined relationships
-     * @param parentWindow The parent window.
+     * @param parentWindow      The parent window.
      */
     public static void editPackage(final SpdxPackage pkg, final List<SpdxPackage> relatablePackages, Window parentWindow) {
 
         final PackageEditor packageEditor = new PackageEditor(pkg, relatablePackages);
         final Stage dialogStage = new Stage();
-        dialogStage.setTitle("Edit SPDX Package: "+pkg.getName());
+        dialogStage.setTitle("Edit SPDX Package: " + pkg.getName());
         dialogStage.initStyle(StageStyle.DECORATED);
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setY(parentWindow.getX() + parentWindow.getWidth() / 2);
@@ -288,6 +296,15 @@ public class PackageEditor {
             currentFile = null;
             //Set the file type checkbox values to reflect this file's types
             chkListFileTypes.getCheckModel().clearChecks();
+
+            //If multiple selections, then disable everything but the delete button
+            boolean multipleSelections = filesTable.getSelectionModel().getSelectedItems().size() > 1;
+            chkListFileTypes.setDisable(multipleSelections);
+            //Disable/enable usage checkboxes for multiple selection
+            Stream.of(chkExcludeFile, chkBuildTool, chkMetafile, chkOptionalComponent, chkDocumentation, chkTestCase, chkDataFile).forEach(checkbox -> checkbox.setDisable(multipleSelections));
+            if (multipleSelections) return;
+
+
             //The element lookup by index seems to be broken on the CheckListView control,
             //so we'll have to provide the indices
 
@@ -327,10 +344,13 @@ public class PackageEditor {
         }
     }
 
-    public void handleDeleteFileFromPackageClick(MouseEvent event){
-        SpdxFile fileToRemove = filesTable.getSelectionModel().getSelectedItem().getValue();
-        filesTable.getRoot().getChildren().remove(filesTable.getSelectionModel().getSelectedItem());
-        SpdxLogic.removeFileFromPackage(pkg, fileToRemove);
+    public void handleDeleteFileFromPackageClick(MouseEvent event) {
+        List<TreeItem<SpdxFile>> itemsToRemove = ImmutableList.copyOf(filesTable.getSelectionModel().getSelectedItems());
+        List<Integer> selectedIndices = ImmutableList.copyOf(filesTable.getSelectionModel().getSelectedIndices());
+        filesTable.getSelectionModel().clearSelection();
+        filesTable.getRoot().getChildren().removeAll(itemsToRemove);
+        SpdxLogic.removeFilesFromPackage(pkg, itemsToRemove.stream().map(TreeItem::getValue).collect(Collectors.toList()));
+
     }
 
     private void addOrRemoveFileRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
@@ -363,7 +383,7 @@ public class PackageEditor {
 
     }
 
-    private void handleTargetPackageSelected(SpdxPackage pkg){
+    private void handleTargetPackageSelected(SpdxPackage pkg) {
         //Get the relationshpis the edited package has to the selected target package.
         List<StringableWrapper<RelationshipType>> relationshipTypes = Arrays.stream(this.pkg.getRelationships())
                 .filter(relationship -> Objects.equals(relationship.getRelatedSpdxElement(), pkg))
@@ -374,9 +394,9 @@ public class PackageEditor {
         btnAddRelationship.setDisable(pkg == null);
     }
 
-    private void handleChkExcludeFileChange(boolean newValue){
-        if (currentFile != null){
-            if (newValue){
+    private void handleChkExcludeFileChange(boolean newValue) {
+        if (currentFile != null) {
+            if (newValue) {
                 SpdxLogic.excludeFileFromVerification(pkg, currentFile);
             } else {
                 SpdxLogic.unexcludeFileFromVerification(pkg, currentFile);

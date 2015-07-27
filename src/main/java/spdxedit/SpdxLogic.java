@@ -285,10 +285,10 @@ public class SpdxLogic {
         }
     }
 
-    public static void removeFileFromPackage(SpdxPackage pkg, SpdxFile fileToRemove) {
+    public static void removeFilesFromPackage(SpdxPackage pkg, List<SpdxFile> filesToRemove) {
         try {
             SpdxFile[] newFiles = Arrays.stream(pkg.getFiles())
-                    .filter(currentFile -> !Objects.equals(fileToRemove, currentFile))
+                    .filter(currentFile -> !filesToRemove.contains(currentFile))
                     .toArray(size -> new SpdxFile[size]);
             pkg.setFiles(newFiles);
             recomputeVerificationCode(pkg);
