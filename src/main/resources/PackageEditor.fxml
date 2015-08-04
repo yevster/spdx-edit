@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
+<?import org.controlsfx.control.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.PropertySheet?>
+
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="558.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
 
 
@@ -50,8 +53,9 @@
                      <CheckBox fx:id="chkOptionalComponent" layoutX="561.0" layoutY="217.0" mnemonicParsing="false" text="Optional Component" />
                      <CheckBox fx:id="chkMetafile" layoutX="561.0" layoutY="257.0" mnemonicParsing="false" text="Metafile" />
                      <Label layoutX="561.0" layoutY="14.0" text="Relationship to package:" />
-                     <Button fx:id="btnDeleteFileFromPackage" disable="true" layoutX="541.0" layoutY="377.0" mnemonicParsing="false" onMouseClicked="#handleDeleteFileFromPackageClick" text="Delete" />
+                     <Button fx:id="btnDeleteFileFromPackage" disable="true" layoutX="541.0" layoutY="377.0" minWidth="56.0" mnemonicParsing="false" onMouseClicked="#handleDeleteFileFromPackageClick" text="Delete" />
                      <CheckBox fx:id="chkExcludeFile" layoutX="561.0" layoutY="297.0" mnemonicParsing="false" text="Exclude From Verification" />
+                     <Button fx:id="btnAddFile" disable="true" layoutX="540.0" layoutY="345.0" minWidth="56.0" mnemonicParsing="false" onMouseClicked="#handleAddFileClick" text="Add" />
                         </children>
                     </AnchorPane>
                 </content>
