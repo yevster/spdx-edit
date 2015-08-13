@@ -72,8 +72,11 @@ public class MainSceneController {
 
     private FileChooser getSpdxFileChooser() {
         FileChooser chooser = new FileChooser();
+
         FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter("spdx", "*.spdx");
+
         chooser.getExtensionFilters().add(spdxExtensionFilter);
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("rdf", "*.rdf"));
         chooser.setSelectedExtensionFilter(spdxExtensionFilter);
         return chooser;
     }

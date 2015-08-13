@@ -35,10 +35,15 @@ import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.util.StringableWrapper;
 
 import java.io.IOException;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,6 +68,12 @@ public class PackageEditor {
 
     @FXML
     private Button btnDeleteFileFromPackage;
+
+    @FXML
+    private Button btnAddFile;
+
+    @FXML
+    private Button btnCopyright;
 
     /**
      * Package properties
@@ -157,6 +168,8 @@ public class PackageEditor {
         assert tabRelationships != null : "fx:id=\"tabRelationships\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnOk != null : "fx:id=\"btnOk\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnDeleteFileFromPackage != null : "fx:id=\"btnDeleteFileFromPackage\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnAddFile != null : "fx:id=\"btnAddFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert btnCopyright != null : "fx:id=\"btnCopyright\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
 
         //File relationship checkboxes
@@ -402,6 +415,19 @@ public class PackageEditor {
                 SpdxLogic.unexcludeFileFromVerification(pkg, currentFile);
             }
         }
+    }
+
+    public void handleBtnCopyrightClick(MouseEvent event){
+        String oldCopyright = currentFile.getCopyrightText();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(currentFile.getName() + " copyright");
+        dialog.setHeaderText("Enter the copyright text");
+        dialog.setContentText(oldCopyright);
+        Optional<String> newCopyrightText = dialog.showAndWait();
+        if (newCopyrightText.isPresent()){
+            currentFile.setCopyrightText(newCopyrightText.get());
+        }
+
     }
 
 }
