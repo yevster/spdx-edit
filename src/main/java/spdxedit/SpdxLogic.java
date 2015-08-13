@@ -81,6 +81,8 @@ public class SpdxLogic {
         }
     }
 
+
+
     /**
      * Creates a new package with the specified license, name, comment, and root path.
      *
@@ -123,10 +125,7 @@ public class SpdxLogic {
                         if (omitHiddenFiles && (file.getFileName().toString().startsWith(".") || Files.isHidden(file)))
                             return FileVisitResult.CONTINUE;
                         try {
-                            String checksum = getChecksumForFile(file);
-                            FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
-                            String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
-                            SpdxFile addedFile = new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
+                            SpdxFile addedFile = newSpdxFile(file, baseUri);
                             addedFiles.add(addedFile);
                         } catch (InvalidSPDXAnalysisException e) {
                             throw new RuntimeException(e);
@@ -154,6 +153,24 @@ public class SpdxLogic {
         } catch (InvalidSPDXAnalysisException | IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri){
+        try {
+            SpdxFile newFile = SpdxLogic.newSpdxFile(newFilePath, baseUri);
+            SpdxFile[] newFiles = ArrayUtils.add(pkg.getFiles(), newFile);
+            pkg.setFiles(newFiles);
+            return newFile;
+        } catch (IOException | InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static SpdxFile newSpdxFile(Path file, String baseUri) throws IOException, InvalidSPDXAnalysisException {
+        String checksum = getChecksumForFile(file);
+        FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
+        String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
+        return new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
     }
 
     //TODO: Make/find a more exhaustive list

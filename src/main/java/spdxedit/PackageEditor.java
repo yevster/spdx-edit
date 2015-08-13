@@ -11,10 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.stage.*;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
@@ -34,8 +31,11 @@ import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.util.StringableWrapper;
 
+import java.io.File;
 import java.io.IOException;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -271,7 +271,9 @@ public class PackageEditor {
                     final SpdxFile dummyfile = new SpdxFile(pkg.getName(), null, null, null, null, null, null, null, null, null, null, null, null);
                     TreeItem<SpdxFile> root = new TreeItem<>(dummyfile);
                     packageEditor.filesTable.setRoot(root);
-
+                    //Assume a package without is external
+                    //TODO: replace with external packages or whatever alternate mechanism in 2.1
+                    packageEditor.btnAddFile.setDisable(pkg.getFiles().length == 0);
                     root.getChildren().setAll(Stream.of(pkg.getFiles())
                             .sorted(Comparator.comparing(file -> StringUtils.lowerCase(file.getName()))) //Sort by file name
                             .map(TreeItem<SpdxFile>::new)
@@ -364,6 +366,16 @@ public class PackageEditor {
         filesTable.getRoot().getChildren().removeAll(itemsToRemove);
         SpdxLogic.removeFilesFromPackage(pkg, itemsToRemove.stream().map(TreeItem::getValue).collect(Collectors.toList()));
 
+    }
+
+    public void handleAddFileClick(MouseEvent event) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Add file");
+        File file = chooser.showOpenDialog(btnAddFile.getParent().getScene().getWindow());
+        if (file==null) //Dialog cancelled.
+            return;
+        Path path = Paths.get(file.getAbsolutePath());
+        SpdxLogic.addFileToPackage(pkg, path, file.toURI().toString());
     }
 
     private void addOrRemoveFileRelationshipToPackage(RelationshipType relationshipType, boolean shouldExist) {
