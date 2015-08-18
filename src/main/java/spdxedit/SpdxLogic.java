@@ -339,16 +339,16 @@ public class SpdxLogic {
     }
 
 
-    //TODO: Add unit test
     public static String computePackageVerificationCode(SpdxPackage pkg) {
         try {
             String combinedSha1s = Arrays.stream(pkg.getFiles())
-                    .filter(spdxFile -> ArrayUtils.contains(getVerificationCodeHandlingException(pkg).getExcludedFileNames(), spdxFile.getName())) //Filter out excluded files
+                    .filter(spdxFile -> !ArrayUtils.contains(getVerificationCodeHandlingException(pkg).getExcludedFileNames(), spdxFile.getName())) //Filter out excluded files
                     .map(SpdxLogic::getSha1Checksum) //Get sha1 checksum for each file
                     .map(Checksum::getValue) //Get the string value of the checksum
                     .sorted() //Sort them
                     .collect(Collectors.joining()) //Combine them into a single string
                     ;
+            assert (!"".equals(combinedSha1s));
             String result = new String(Hex.encodeHex(MessageDigest.getInstance("SHA1").digest(Hex.decodeHex(combinedSha1s.toCharArray()))));
             return result;
 
