@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -19,7 +20,10 @@ import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.DigestInputStream;
@@ -160,6 +164,7 @@ public class SpdxLogic {
             SpdxFile newFile = SpdxLogic.newSpdxFile(newFilePath, baseUri);
             SpdxFile[] newFiles = ArrayUtils.add(pkg.getFiles(), newFile);
             pkg.setFiles(newFiles);
+            recomputeVerificationCode(pkg);
             return newFile;
         } catch (IOException | InvalidSPDXAnalysisException e) {
             throw new RuntimeException(e);
@@ -218,16 +223,8 @@ public class SpdxLogic {
 
 
     public static String getChecksumForFile(Path path) throws IOException {
-
-        final MessageDigest checksumDigest;
-        try {
-            checksumDigest = MessageDigest.getInstance("SHA1");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        try (DigestInputStream dis = new DigestInputStream(Files.newInputStream(path, StandardOpenOption.READ), checksumDigest)) {
-            byte[] resultBytes = checksumDigest.digest();
-            return Hex.encodeHexString(resultBytes);
+        try (InputStream is  = Files.newInputStream(path, StandardOpenOption.READ)) {
+            return DigestUtils.shaHex(is);
         }
     }
 
@@ -349,10 +346,11 @@ public class SpdxLogic {
                     .collect(Collectors.joining()) //Combine them into a single string
                     ;
             assert (!"".equals(combinedSha1s));
-            String result = new String(Hex.encodeHex(MessageDigest.getInstance("SHA1").digest(Hex.decodeHex(combinedSha1s.toCharArray()))));
+
+            String result = DigestUtils.shaHex(combinedSha1s);
             return result;
 
-        } catch (InvalidSPDXAnalysisException | NoSuchAlgorithmException | DecoderException e) {
+        } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException(e);
         }
     }
