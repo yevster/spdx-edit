@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="375.0" prefWidth="571.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <RadioButton fx:id="rdoNone" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="255.0" selected="true" text="NONE" />
+      <RadioButton fx:id="rdoNoAssert" layoutX="14.0" layoutY="60.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="255.0" text="No asserion" />
+      <RadioButton fx:id="rdoExpression" layoutX="14.0" layoutY="100.0" mnemonicParsing="false" text="Expression:" />
+      <ComboBox fx:id="cboExpression" layoutX="116.0" layoutY="96.0" prefHeight="22.0" prefWidth="434.0" />
+   </children>
+</Pane>
