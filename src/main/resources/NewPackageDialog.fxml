@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.Pane?>
 
@@ -12,8 +10,8 @@
     <Label layoutX="36.0" layoutY="78.0" text="License" />
     <TextField fx:id="name" layoutX="111.0" layoutY="38.0" prefHeight="31.0" prefWidth="245.0" />
     <ComboBox fx:id="licenseSelection" layoutX="111.0" layoutY="73.0" prefHeight="31.0" prefWidth="245.0" />
-    <TextArea fx:id="comment" layoutX="111.0" layoutY="116.0" prefHeight="237.0" prefWidth="446.0" />
-    <Label layoutX="36.0" layoutY="116.0" text="Comment" />
+    <TextArea fx:id="downloadLocation" layoutX="36.0" layoutY="136.0" prefHeight="210.0" prefWidth="446.0" />
+    <Label layoutX="36.0" layoutY="116.0" text="Download Location" />
     <CheckBox fx:id="chkOmitHiddenFiles" layoutX="111.0" layoutY="364.0" mnemonicParsing="false" selected="true" text="Omit Hidden Files" />
     <CheckBox fx:id="chkRemotePackage" layoutX="311.0" layoutY="364.0" mnemonicParsing="false" selected="false" text="External Package" />
 </Pane>

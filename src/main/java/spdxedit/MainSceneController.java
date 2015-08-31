@@ -1,11 +1,15 @@
 package spdxedit;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -32,6 +36,9 @@ public class MainSceneController {
     private TreeView<Path> dirTree;
 
     @FXML
+    private TextField txtDocumentName;
+
+    @FXML
     private Button chooseDir;
 
     @FXML
@@ -39,6 +46,9 @@ public class MainSceneController {
 
     @FXML
     private Button saveSpdx;
+
+    @FXML
+    private Button validateSpdx;
 
     @FXML
     private ListView<SpdxPackage> addedPackagesUiList;
@@ -87,7 +97,10 @@ public class MainSceneController {
         assert chooseDir != null : "fx:id=\"chooseDir\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert btnAddPackage != null : "fx:id=\"btnAddPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert saveSpdx != null : "fx:id=\"saveSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert validateSpdx != null : "fx:id=\"validateSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert txtDocumentName != null : "fx:id=\"txtDocumentName\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert addedPackagesUiList != null : "fx:id=\"addedPackagesUiList\" was not injected: check your FXML file 'MainScene.fxml'.";
+        txtDocumentName.textProperty().addListener((observable, oldValue, newValue) -> handleTxtDocumentNameChanged(newValue));
         addedPackagesUiList.setCellFactory(param -> new SpdxPackageListCell());
 
     }
@@ -163,6 +176,7 @@ public class MainSceneController {
             SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());
             this.documentToEdit = loadedDocument;
             this.addedPackagesUiList.getItems().setAll(SpdxLogic.getSpdxPackagesInDocument(loadedDocument).collect(Collectors.toList()));
+            this.txtDocumentName.setText(loadedDocument.getName());
         } catch (InvalidSPDXAnalysisException isae) {
             logger.error("Invalid SPDX load attempt", isae);
             new Alert(Alert.AlertType.ERROR, "Invalid SPDX file " + targetFile.getAbsolutePath());
@@ -185,8 +199,46 @@ public class MainSceneController {
         }
     }
 
+    public void handleValidateSpdxClicked(MouseEvent event) {
+        List<String> verificationResult = this.documentToEdit.verify();
+        Alert alert = new Alert(verificationResult.size() == 0 ? Alert.AlertType.INFORMATION : Alert.AlertType.WARNING);
+        alert.setTitle(Main.APP_TITLE);
+        if (verificationResult.size() == 0) {
+            alert.setHeaderText("Document valid.");
+            alert.setContentText("This SPDX document is valid.");
+        } else {
+            alert.setHeaderText("Document invalid.");
+
+            TextArea textArea = new TextArea(StringUtils.join(verificationResult, ",\n"));
+            textArea.setEditable(false);
+            textArea.setWrapText(true);
+            textArea.setPrefWidth(808);
+            textArea.setMaxWidth(Double.MAX_VALUE);
+            textArea.setMaxHeight(Double.MAX_VALUE);
+            GridPane.setVgrow(textArea, Priority.ALWAYS);
+            GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+            GridPane validationCongtent = new GridPane();
+            validationCongtent.setMaxWidth(Double.MAX_VALUE);
+            validationCongtent.add(new Label("Problems:"), 0, 0);
+            validationCongtent.add(textArea, 0, 1);
+
+            // Set expandable Exception into the dialog pane.
+            alert.getDialogPane().setContent(validationCongtent);
+
+        }
+        alert.showAndWait();
+    }
+
     public void handleDirectoryTreeClicked(MouseEvent event) {
         btnAddPackage.setDisable(dirTree.getSelectionModel().isEmpty());
     }
+
+
+    @FXML
+    void handleTxtDocumentNameChanged(String newName) {
+        this.documentToEdit.setName(newName);
+    }
+
 
 }

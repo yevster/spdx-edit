@@ -1,9 +1,8 @@
 package spdxedit;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import com.google.common.collect.Ordering;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,15 +11,12 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.*;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
 import org.controlsfx.control.PropertySheet;
 import org.controlsfx.property.BeanPropertyUtils;
-import org.controlsfx.property.editor.Editors;
-import org.controlsfx.property.editor.PropertyEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -33,17 +29,9 @@ import spdxedit.util.StringableWrapper;
 
 import java.io.File;
 import java.io.IOException;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 

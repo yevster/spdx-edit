@@ -16,6 +16,7 @@ import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
@@ -42,6 +43,7 @@ public class SpdxLogic {
         SpdxDocumentContainer container = null;
         try {
             container = new SpdxDocumentContainer(uri, "SPDX-2.0");
+            container.getSpdxDocument().getCreationInfo().setCreators(new String[]{"Tool: SPDX Edit"});
             return container.getSpdxDocument();
         } catch (InvalidSPDXAnalysisException e) {
             throw new RuntimeException("Unable to create blank SPDX document", e);
@@ -86,7 +88,6 @@ public class SpdxLogic {
     }
 
 
-
     /**
      * Creates a new package with the specified license, name, comment, and root path.
      *
@@ -97,7 +98,7 @@ public class SpdxLogic {
      * @param omitHiddenFiles
      * @return
      */
-    public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, String licenseId, String name, String comment, final boolean omitHiddenFiles) {
+    public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, String licenseId, String name, String downloadLocation, final boolean omitHiddenFiles) {
         Objects.requireNonNull(pkgRootPath);
         try {
             AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseId);
@@ -105,11 +106,12 @@ public class SpdxLogic {
             SpdxPackage pkg = new SpdxPackage(name, license,
                     new AnyLicenseInfo[]{} /* Licences from files*/,
                     null /*Declared licenses*/,
-                    null /*Download location*/,
-                    null /*Download Location*/,
+                    license,
+                    downloadLocation,
                     new SpdxFile[]{} /*Files*/,
                     new SpdxPackageVerificationCode(name, new String[]{}));
-            pkg.setComment(comment);
+            pkg.setLicenseInfosFromFiles(new AnyLicenseInfo[]{new SpdxNoAssertionLicense()});
+            pkg.setCopyrightText("NOASSERTION");
 
             if (pkgRootPath.isPresent()) {
                 //Add files in path
@@ -159,7 +161,7 @@ public class SpdxLogic {
         }
     }
 
-    public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri){
+    public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri) {
         try {
             SpdxFile newFile = SpdxLogic.newSpdxFile(newFilePath, baseUri);
             SpdxFile[] newFiles = ArrayUtils.add(pkg.getFiles(), newFile);
@@ -175,7 +177,7 @@ public class SpdxLogic {
         String checksum = getChecksumForFile(file);
         FileType[] fileTypes = SpdxLogic.getTypesForFile(file);
         String relativeFileUrl = StringUtils.removeStart(file.toUri().toString(), baseUri);
-        return new SpdxFile(relativeFileUrl, fileTypes, checksum, null, null, null, null, null, null);
+        return new SpdxFile(relativeFileUrl, fileTypes, checksum, new SpdxNoAssertionLicense(), new AnyLicenseInfo[]{new SpdxNoAssertionLicense()}, null, "NOASSERTION", null, null);
     }
 
     //TODO: Make/find a more exhaustive list
@@ -223,7 +225,7 @@ public class SpdxLogic {
 
 
     public static String getChecksumForFile(Path path) throws IOException {
-        try (InputStream is  = Files.newInputStream(path, StandardOpenOption.READ)) {
+        try (InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
             return DigestUtils.shaHex(is);
         }
     }

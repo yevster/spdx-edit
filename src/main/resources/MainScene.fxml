@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 
 <SplitPane dividerPositions="0.4398034398034398" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-           minWidth="-Infinity" prefHeight="473.0" prefWidth="816.0" xmlns="http://javafx.com/javafx/8.0.45"
+           minWidth="-Infinity" prefHeight="473.0" prefWidth="816.0" xmlns="http://javafx.com/javafx/8.0.40"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="spdxedit.MainSceneController">
     <items>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="268.0">
@@ -17,18 +17,22 @@
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="471.0" prefWidth="555.0">
             <children>
-                <Button fx:id="chooseDir" layoutX="14.0" layoutY="25.0" mnemonicParsing="false"
+                <Button fx:id="chooseDir" layoutX="14.0" layoutY="80.0" mnemonicParsing="false"
                         onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..."/>
-                <Button fx:id="btnAddPackage" layoutX="14.0" layoutY="75.0" mnemonicParsing="false"
+                <Button fx:id="btnAddPackage" layoutX="14.0" layoutY="130.0" mnemonicParsing="false"
                         onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0"
                         text="Add Package"/>
-                <Button fx:id="saveSpdx" layoutX="14.0" layoutY="125.0" mnemonicParsing="false"
+                <Button fx:id="validateSpdx" layoutX="14.0" layoutY="180.0" mnemonicParsing="false"
+                        onMouseClicked="#handleValidateSpdxClicked" prefWidth="145" text="Validate SPDX..."/>
+                <Button fx:id="saveSpdx" layoutX="14.0" layoutY="230.0" mnemonicParsing="false"
                         onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX..."/>
-                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="175.0" mnemonicParsing="false"
+                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="280.0" mnemonicParsing="false"
                         onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX..."/>
-                <ListView fx:id="addedPackagesUiList" editable="true" layoutX="184.0" layoutY="-1.0" prefHeight="471.0"
-                          prefWidth="276.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                          AnchorPane.topAnchor="0.0" onMouseClicked="#handlePackageListClicked"/>
+                <ListView fx:id="addedPackagesUiList" editable="true" layoutX="184.0" layoutY="-1.0"
+                          onMouseClicked="#handlePackageListClicked" prefHeight="471.0" prefWidth="276.0"
+                          AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                <TextField fx:id="txtDocumentName" layoutX="14.0" layoutY="25.0" prefHeight="26.0" prefWidth="145.0"
+                           promptText="Document name" AnchorPane.leftAnchor="14.0"/>
             </children>
         </AnchorPane>
     </items>

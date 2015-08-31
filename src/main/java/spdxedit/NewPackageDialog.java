@@ -42,7 +42,7 @@ public class NewPackageDialog {
     private CheckBox chkRemotePackage;
 
     @FXML
-    private TextArea comment;
+    private TextArea downloadLocation;
 
     private Path path;
 
@@ -100,7 +100,7 @@ public class NewPackageDialog {
         assert cancel != null : "fx:id=\"cancel\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert licenseSelection != null : "fx:id=\"licenseSelection\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
-        assert comment != null : "fx:id=\"comment\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
+        assert downloadLocation != null : "fx:id=\"downloadLocation\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert chkOmitHiddenFiles != null : "fx:id=\"chkOmitHiddenFiles\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert chkRemotePackage != null : "fx:id=\"chkRemotePackage\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
 
@@ -109,7 +109,7 @@ public class NewPackageDialog {
 
     private SpdxPackage createSpdxPackageFromInputs() {
         Optional<Path> pathForPackage = chkRemotePackage.isSelected() ? Optional.empty() : Optional.of(this.path);
-        return SpdxLogic.createSpdxPackageForPath(pathForPackage, licenseSelection.getValue(), name.getText(), comment.getText(), chkOmitHiddenFiles.isSelected());
+        return SpdxLogic.createSpdxPackageForPath(pathForPackage, licenseSelection.getValue(), name.getText(), downloadLocation.getText(), chkOmitHiddenFiles.isSelected());
     }
 
 
