@@ -31,6 +31,8 @@ public class LicenseEditControl {
 
     private AnyLicenseInfo initialValue = new SpdxNoAssertionLicense();
 
+    private boolean showExtractLicenseButton;
+
     @FXML
     private ResourceBundle resources;
 
@@ -63,7 +65,8 @@ public class LicenseEditControl {
 
     }
 
-    LicenseEditControl(SpdxDocumentContainer documentContainer) {
+    LicenseEditControl(SpdxDocumentContainer documentContainer, boolean showExtractLicenseButton) {
+        this.showExtractLicenseButton = showExtractLicenseButton;
         this.documentContainer = documentContainer;
     }
 
@@ -90,6 +93,8 @@ public class LicenseEditControl {
         rdoExtracted.selectedProperty().addListener((observable, oldValue, newValue) -> chcExtractedLicenses.setDisable(!newValue));
 
         chcListedLicense.getItems().addAll(Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().collect(Collectors.toList()));
+
+        btnNewFromFile.setVisible(showExtractLicenseButton);
 
         //Apply the initial value
         if (this.initialValue instanceof SpdxListedLicense) {

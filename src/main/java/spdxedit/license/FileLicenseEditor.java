@@ -12,7 +12,7 @@ import org.spdx.rdfparser.model.SpdxFile;
 public class FileLicenseEditor {
 
     public static void editConcludedLicense(SpdxFile file, SpdxDocumentContainer container) {
-        LicenseEditControl control = new LicenseEditControl(container);
+        LicenseEditControl control = new LicenseEditControl(container, true);
         if (file.getLicenseConcluded() != null) {
             control.setInitialValue(file.getLicenseConcluded());
         }
