@@ -181,7 +181,7 @@ public class MainSceneController {
             List<SpdxPackage> otherPackages = SpdxLogic.getSpdxPackagesInDocument(documentToEdit)
                     .filter(spdxPackage -> !Objects.equals(spdxPackage, toEdit))
                     .collect(Collectors.toList());
-            PackageEditor.editPackage(toEdit, otherPackages, addedPackagesUiList.getScene().getWindow());
+            PackageEditor.editPackage(toEdit, otherPackages, documentToEdit.getDocumentContainer(), addedPackagesUiList.getScene().getWindow());
         }
     }
 

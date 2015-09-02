@@ -15,7 +15,9 @@ import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
+import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.license.SpdxListedLicense;
 import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
@@ -84,7 +86,6 @@ public class SpdxLogic {
             throw new RuntimeException(e);
         }
     }
-
 
 
     /**
@@ -159,7 +160,7 @@ public class SpdxLogic {
         }
     }
 
-    public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri){
+    public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri) {
         try {
             SpdxFile newFile = SpdxLogic.newSpdxFile(newFilePath, baseUri);
             SpdxFile[] newFiles = ArrayUtils.add(pkg.getFiles(), newFile);
@@ -223,7 +224,7 @@ public class SpdxLogic {
 
 
     public static String getChecksumForFile(Path path) throws IOException {
-        try (InputStream is  = Files.newInputStream(path, StandardOpenOption.READ)) {
+        try (InputStream is = Files.newInputStream(path, StandardOpenOption.READ)) {
             return DigestUtils.shaHex(is);
         }
     }
@@ -310,6 +311,20 @@ public class SpdxLogic {
             throw new RuntimeException(e);
         }
     }
+
+    public static Stream<SpdxListedLicense> getAllListedLicenses() {
+        ListedLicenses listedLicenses = ListedLicenses.getListedLicenses();
+
+        return Arrays.stream(listedLicenses.getSpdxListedLicenseIds()).map(id -> {
+            try {
+                return listedLicenses.getListedLicenseById(id);
+            } catch (InvalidSPDXAnalysisException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+    }
+
 
     //Properties of a package that can be edited on the properties tab.
     //TODO: Create editors, pretty names, etc.
