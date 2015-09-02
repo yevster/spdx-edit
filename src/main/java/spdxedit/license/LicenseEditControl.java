@@ -1,28 +1,21 @@
 
 package spdxedit.license;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import javafx.util.StringConverter;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.*;
-import org.spdx.rdfparser.model.SpdxDocument;
-import org.spdx.rdfparser.model.SpdxFile;
-import spdxedit.SpdxLogic;
-import spdxedit.util.StringConverters;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 
 public class LicenseEditControl {
@@ -99,11 +92,13 @@ public class LicenseEditControl {
         //Apply the initial value
         if (this.initialValue instanceof SpdxListedLicense) {
             chcListedLicense.setValue(((SpdxListedLicense) initialValue).getLicenseId());
+            chcListedLicense.setDisable(false);
             rdoStandard.selectedProperty().setValue(true);
         } else if (initialValue instanceof ExtractedLicenseInfo) {
             chcExtractedLicenses.getItems().clear();
             chcExtractedLicenses.getItems().addAll(Arrays.stream(documentContainer.getExtractedLicenseInfos()).collect(Collectors.toList()));
             chcExtractedLicenses.setValue((ExtractedLicenseInfo) initialValue);
+            chcExtractedLicenses.setDisable(false);
             rdoExtracted.selectedProperty().setValue(true);
         } else if (initialValue instanceof SpdxNoAssertionLicense) {
             rdoNoAssert.selectedProperty().setValue(true);

@@ -1,18 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.Pane?>
-
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="252.0" prefWidth="572.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <RadioButton fx:id="rdoNone" layoutX="14.0" layoutY="20.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="255.0" selected="true" text="NONE" />
       <RadioButton fx:id="rdoNoAssert" layoutX="14.0" layoutY="60.0" mnemonicParsing="false" prefHeight="22.0" prefWidth="255.0" text="No asserion" />
       <RadioButton fx:id="rdoStandard" layoutX="14.0" layoutY="100.0" mnemonicParsing="false" text="Standard:" />
-      <ChoiceBox fx:id="chcListedLicense" layoutX="102.0" layoutY="96.0" prefHeight="26.0" prefWidth="452.0" />
+      <ChoiceBox fx:id="chcListedLicense" layoutX="102.0" layoutY="96.0" prefHeight="26.0" prefWidth="452.0" disable="true"/>
       <RadioButton fx:id="rdoExtracted" layoutX="14.0" layoutY="139.0" mnemonicParsing="false" text="From Document:" />
-      <ChoiceBox fx:id="chcExtractedLicenses" layoutX="142.0" layoutY="135.0" prefHeight="26.0" prefWidth="413.0" />
+      <ChoiceBox fx:id="chcExtractedLicenses" layoutX="142.0" layoutY="135.0" prefHeight="26.0" prefWidth="413.0" disable="true"/>
       <Button fx:id="btnNewFromFile" layoutX="14.0" layoutY="196.0" mnemonicParsing="false" onMouseClicked="#handleBtnNewFromFileClick" text="New license from this file..." />
    </children>
 </Pane>
