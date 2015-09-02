@@ -57,6 +57,7 @@
                      <CheckBox fx:id="chkExcludeFile" layoutX="561.0" layoutY="297.0" mnemonicParsing="false" text="Exclude From Verification" />
                      <Button fx:id="btnAddFile" disable="true" layoutX="540.0" layoutY="345.0" minWidth="56.0" mnemonicParsing="false" onMouseClicked="#handleAddFileClick" text="Add" />
                      <Button fx:id="btnCopyright" layoutX="632.0" layoutY="345.0" mnemonicParsing="false" onMouseClicked="#handleBtnCopyrightClick" prefHeight="26.0" prefWidth="114.0" text="Copyright..." />
+                     <Button fx:id="btnFileLicense" layoutX="632.0" layoutY="377.0" mnemonicParsing="false" onMouseClicked="#handleBtnFileLicenseClick" prefHeight="26.0" prefWidth="114.0" text="License..." />
                         </children>
                     </AnchorPane>
                 </content>

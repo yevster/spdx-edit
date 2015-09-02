@@ -20,11 +20,13 @@ import org.controlsfx.property.BeanPropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.model.Relationship;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
+import spdxedit.license.FileLicenseEditor;
 import spdxedit.util.StringableWrapper;
 
 import java.io.File;
@@ -62,6 +64,9 @@ public class PackageEditor {
 
     @FXML
     private Button btnCopyright;
+
+    @FXML
+    private Button btnFileLicense;
 
     /**
      * Package properties
@@ -140,6 +145,9 @@ public class PackageEditor {
     //The file currently being edited
     private SpdxFile currentFile;
 
+    //The container of the document being edited.
+    private SpdxDocumentContainer documentContainer;
+
     //Packages to which the edited package can have a relationship
     private List<SpdxPackage> otherPackages;
 
@@ -158,7 +166,7 @@ public class PackageEditor {
         assert btnDeleteFileFromPackage != null : "fx:id=\"btnDeleteFileFromPackage\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnAddFile != null : "fx:id=\"btnAddFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert btnCopyright != null : "fx:id=\"btnCopyright\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-
+        assert btnFileLicense != null : "fx:id=\"btnFileLicense\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
         //File relationship checkboxes
         assert chkDataFile != null : "fx:id=\"chkDataFile\" was not injected: check your FXML file 'PackageEditor.fxml'.";
@@ -236,9 +244,9 @@ public class PackageEditor {
      * @param relatablePackages Packages to which the edited package may optionally have defined relationships
      * @param parentWindow      The parent window.
      */
-    public static void editPackage(final SpdxPackage pkg, final List<SpdxPackage> relatablePackages, Window parentWindow) {
+    public static void editPackage(final SpdxPackage pkg, final List<SpdxPackage> relatablePackages, SpdxDocumentContainer documentContainer, Window parentWindow) {
 
-        final PackageEditor packageEditor = new PackageEditor(pkg, relatablePackages);
+        final PackageEditor packageEditor = new PackageEditor(pkg, relatablePackages, documentContainer);
         final Stage dialogStage = new Stage();
         dialogStage.setTitle("Edit SPDX Package: " + pkg.getName());
         dialogStage.initStyle(StageStyle.DECORATED);
@@ -284,9 +292,10 @@ public class PackageEditor {
         }
     }
 
-    private PackageEditor(SpdxPackage pkg, List<SpdxPackage> relatablePackages) {
+    private PackageEditor(SpdxPackage pkg, List<SpdxPackage> relatablePackages, SpdxDocumentContainer documentContainer) {
         this.pkg = pkg;
         this.otherPackages = relatablePackages;
+        this.documentContainer = documentContainer;
     }
 
     //Load the values for the file in all file editing contorls
@@ -430,4 +439,8 @@ public class PackageEditor {
 
     }
 
+
+    public void handleBtnFileLicenseClick(MouseEvent event){
+        FileLicenseEditor.editConcludedLicense(this.currentFile, documentContainer);
+    }
 }
