@@ -312,18 +312,6 @@ public class SpdxLogic {
         }
     }
 
-    public static Stream<SpdxListedLicense> getAllListedLicenses() {
-        ListedLicenses listedLicenses = ListedLicenses.getListedLicenses();
-
-        return Arrays.stream(listedLicenses.getSpdxListedLicenseIds()).map(id -> {
-            try {
-                return listedLicenses.getListedLicenseById(id);
-            } catch (InvalidSPDXAnalysisException e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-    }
 
 
     //Properties of a package that can be edited on the properties tab.

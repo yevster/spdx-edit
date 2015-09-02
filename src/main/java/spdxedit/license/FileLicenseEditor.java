@@ -1,41 +1,45 @@
 package spdxedit.license;
 
 
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
-import javafx.stage.Window;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.DialogPane;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
+import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.model.SpdxFile;
 
 public class FileLicenseEditor {
-    private final SpdxFile editedFile;
 
-    private LicenseEditControl concludedLicenseEditControl;
+    public static void editConcludedLicense(SpdxFile file, SpdxDocumentContainer container) {
+        LicenseEditControl control = new LicenseEditControl(container);
+        if (file.getLicenseConcluded() != null) {
+            control.setInitialValue(file.getLicenseConcluded());
+        }
 
+        DialogPane dialogPane = new DialogPane();
+        dialogPane.getButtonTypes().add(ButtonType.OK);
+        dialogPane.setContent(control.getUi());
 
+        Dialog<AnyLicenseInfo> dialog = new Dialog<>();
+        dialog.setDialogPane(dialogPane);
+        dialog.setResultConverter(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                return control.getValue();
+            } else {
+                throw new RuntimeException("Unexepected button!");
+            }
+        });
 
-    private FileLicenseEditor(SpdxFile file, SpdxDocumentContainer documentContainer){
-        this.editedFile  = file;
-        concludedLicenseEditControl = new LicenseEditControl(documentContainer);
+        dialog.showAndWait();
+
+        try {
+            file.setLicenseConcluded(control.getValue());
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+
+        }
+
     }
-
-   public static void editConcludedLicense(SpdxFile file, SpdxDocumentContainer container) {
-
-       Stage dialog = new Stage();
-       dialog.initStyle(StageStyle.UTILITY);
-       LicenseEditControl control = new LicenseEditControl(container);
-       Scene scene = new Scene(control.getUi());
-       dialog.setScene(scene);
-       dialog.showAndWait();
-       try {
-           file.setLicenseConcluded(control.getValue());
-       } catch (InvalidSPDXAnalysisException e) {
-           throw new RuntimeException(e);
-
-       }
-
-   }
 
 }

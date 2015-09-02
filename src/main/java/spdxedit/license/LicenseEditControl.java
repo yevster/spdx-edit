@@ -29,6 +29,8 @@ public class LicenseEditControl {
 
     private SpdxDocumentContainer documentContainer;
 
+    private AnyLicenseInfo initialValue = new SpdxNoAssertionLicense();
+
     @FXML
     private ResourceBundle resources;
 
@@ -45,7 +47,7 @@ public class LicenseEditControl {
     private RadioButton rdoStandard;
 
     @FXML
-    private ChoiceBox<SpdxListedLicense> chcListedLicense;
+    private ChoiceBox<String> chcListedLicense;
 
     @FXML
     private ChoiceBox<ExtractedLicenseInfo> chcExtractedLicenses;
@@ -75,39 +77,66 @@ public class LicenseEditControl {
         assert rdoExtracted != null : "fx:id=\"rdoExtracted\" was not injected: check your FXML file 'LicenseEditControl.fxml'.";
         assert btnNewFromFile != null : "fx:id=\"btnNewFromFile\" was not injected: check your FXML file 'LicenseEditControl.fxml'.";
 
-        chcListedLicense.setConverter(StringConverters.SPDX_LISTED_LICENSE_CONVERTER);
-        chcListedLicense.getItems().addAll(SpdxLogic.getAllListedLicenses().collect(Collectors.toList()));
+        //Make radio buttons mutually exclusive
+
+        ToggleGroup licenseTypeGroup = new ToggleGroup();
+        rdoExtracted.setToggleGroup(licenseTypeGroup);
+        rdoStandard.setToggleGroup(licenseTypeGroup);
+        rdoNone.setToggleGroup(licenseTypeGroup);
+        rdoNoAssert.setToggleGroup(licenseTypeGroup);
+
+        //Choice boxes should disable when their respective radio buttons are untoggled.
+        rdoStandard.selectedProperty().addListener((observable, oldValue, newValue) -> chcListedLicense.setDisable(!newValue));
+        rdoExtracted.selectedProperty().addListener((observable, oldValue, newValue) -> chcExtractedLicenses.setDisable(!newValue));
+
+        chcListedLicense.getItems().addAll(Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().collect(Collectors.toList()));
+
+        //Apply the initial value
+        if (this.initialValue instanceof SpdxListedLicense) {
+            chcListedLicense.setValue(((SpdxListedLicense) initialValue).getLicenseId());
+            rdoStandard.selectedProperty().setValue(true);
+        } else if (initialValue instanceof ExtractedLicenseInfo) {
+            chcExtractedLicenses.getItems().clear();
+            chcExtractedLicenses.getItems().addAll(Arrays.stream(documentContainer.getExtractedLicenseInfos()).collect(Collectors.toList()));
+            chcExtractedLicenses.setValue((ExtractedLicenseInfo) initialValue);
+            rdoExtracted.selectedProperty().setValue(true);
+        } else if (initialValue instanceof SpdxNoAssertionLicense) {
+            rdoNoAssert.selectedProperty().setValue(true);
+        } else if (initialValue instanceof SpdxNoneLicense) {
+            rdoNone.selectedProperty().setValue(true);
+        } else {
+            new Alert(Alert.AlertType.ERROR, "Unsupported license type: " + initialValue.getClass().getSimpleName() + ".", ButtonType.OK);
+        }
 
     }
 
 
     /**
-     * Sets the value of the control. Do not call before the UI of the control is initialized.
+     * Sets the initial value of the control. Has no impact if called after the UI is initialized.
+     * Must not be null.
+     *
      * @param value
      */
-    public void setValue(AnyLicenseInfo value){
-        if (value instanceof SpdxListedLicense){
-            chcListedLicense.setValue((SpdxListedLicense)value);
-            rdoStandard.selectedProperty().setValue(true);
-        } else if (value instanceof ExtractedLicenseInfo ){
-            chcExtractedLicenses.getItems().clear();
-            chcExtractedLicenses.getItems().addAll(Arrays.stream(documentContainer.getExtractedLicenseInfos()).collect(Collectors.toList()));
-            chcExtractedLicenses.setValue((ExtractedLicenseInfo)value);
-        }
+    public void setInitialValue(AnyLicenseInfo value) {
+        this.initialValue = Objects.requireNonNull(value);
     }
 
-    public AnyLicenseInfo getValue(){
+    public AnyLicenseInfo getValue() {
         AnyLicenseInfo result = null;
-        if (rdoNoAssert.isSelected()){
+        if (rdoNoAssert.isSelected()) {
             result = new SpdxNoAssertionLicense();
-        } else  if (rdoNone.isSelected()){
+        } else if (rdoNone.isSelected()) {
             result = new SpdxNoneLicense();
-        } else if (rdoStandard.isSelected()){
-            result = chcListedLicense.getValue();
-        } else if (rdoExtracted.isSelected()){
+        } else if (rdoStandard.isSelected()) {
+            try {
+                result = ListedLicenses.getListedLicenses().getListedLicenseById(chcListedLicense.getValue());
+            } catch (InvalidSPDXAnalysisException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (rdoExtracted.isSelected()) {
             result = chcExtractedLicenses.getValue();
         }
-        if (result == null){
+        if (result == null) {
             new Alert(Alert.AlertType.ERROR, "Unable to extract selected license", ButtonType.OK);
         }
         return result;
