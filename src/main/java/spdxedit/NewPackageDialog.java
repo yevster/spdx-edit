@@ -11,8 +11,10 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.ListedLicenses;
 import org.spdx.rdfparser.model.SpdxPackage;
+import spdxedit.license.LicenseEditControl;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -33,9 +35,6 @@ public class NewPackageDialog {
     private TextField name;
 
     @FXML
-    private ComboBox<String> licenseSelection;
-
-    @FXML
     private CheckBox chkOmitHiddenFiles;
 
     @FXML
@@ -44,12 +43,18 @@ public class NewPackageDialog {
     @FXML
     private TextArea downloadLocation;
 
+    @FXML
+    private TitledPane paneDeclaredLicense;
+
+
     private Path path;
 
-    private Window parentWindow;
+    private SpdxDocumentContainer documentContainer;
 
-    public static SpdxPackage createPackageWithPrompt(Window parentWindow, Optional<Path> path) {
-        final NewPackageDialog controller = new NewPackageDialog(path);
+    private LicenseEditControl declaredLicenseEdit;
+
+    public static SpdxPackage createPackageWithPrompt(Window parentWindow, Optional<Path> path, SpdxDocumentContainer documentContainer) {
+        final NewPackageDialog controller = new NewPackageDialog(path, documentContainer);
         final Stage dialogStage = new Stage();
         dialogStage.setTitle("Create SPDX Package");
         dialogStage.initStyle(StageStyle.UTILITY);
@@ -63,15 +68,9 @@ public class NewPackageDialog {
             Scene scene = new Scene(pane);
             dialogStage.setScene(scene);
             dialogStage.setOnShown(event -> {
-                controller.licenseSelection.getItems().clear();
-                Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().forEachOrdered(
-                        id -> controller.licenseSelection.getItems().add(id)
-                );
                 if (path.isPresent()) {
                     controller.name.setText(path.get().getFileName().toString());
                 }
-                controller.licenseSelection.getSelectionModel().selectFirst();
-
             });
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
             controller.ok.setOnMouseClicked(event -> dialogStage.close());
@@ -90,8 +89,9 @@ public class NewPackageDialog {
         }
     }
 
-    private NewPackageDialog(Optional<Path> path) {
+    private NewPackageDialog(Optional<Path> path, SpdxDocumentContainer documentContainer) {
         this.path = path.orElse(null);
+        this.documentContainer = documentContainer;
     }
 
     @FXML
@@ -99,17 +99,21 @@ public class NewPackageDialog {
         assert ok != null : "fx:id=\"ok\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert cancel != null : "fx:id=\"cancel\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
-        assert licenseSelection != null : "fx:id=\"licenseSelection\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert downloadLocation != null : "fx:id=\"downloadLocation\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert chkOmitHiddenFiles != null : "fx:id=\"chkOmitHiddenFiles\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert chkRemotePackage != null : "fx:id=\"chkRemotePackage\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
+        assert paneDeclaredLicense != null : "fx:id=\"paneDeclaredLicense\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
+
+        declaredLicenseEdit = new LicenseEditControl(this.documentContainer, false);
+        paneDeclaredLicense.setContent(declaredLicenseEdit.getUi());
+
 
     }
 
 
     private SpdxPackage createSpdxPackageFromInputs() {
         Optional<Path> pathForPackage = chkRemotePackage.isSelected() ? Optional.empty() : Optional.of(this.path);
-        return SpdxLogic.createSpdxPackageForPath(pathForPackage, licenseSelection.getValue(), name.getText(), downloadLocation.getText(), chkOmitHiddenFiles.isSelected());
+        return SpdxLogic.createSpdxPackageForPath(pathForPackage, declaredLicenseEdit.getValue(), name.getText(), downloadLocation.getText(), chkOmitHiddenFiles.isSelected());
     }
 
 

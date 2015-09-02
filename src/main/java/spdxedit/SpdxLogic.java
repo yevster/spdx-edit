@@ -91,15 +91,16 @@ public class SpdxLogic {
      * @param omitHiddenFiles
      * @return
      */
-    public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, String licenseId, String name, String downloadLocation, final boolean omitHiddenFiles) {
+    public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, AnyLicenseInfo declaredLicense, String name, String downloadLocation, final boolean omitHiddenFiles) {
         Objects.requireNonNull(pkgRootPath);
         try {
-            AnyLicenseInfo license = ListedLicenses.getListedLicenses().getListedLicenseById(licenseId);
 
-            SpdxPackage pkg = new SpdxPackage(name, license,
+
+            SpdxPackage pkg = new SpdxPackage(name,
+                    declaredLicense,
                     new AnyLicenseInfo[]{} /* Licences from files*/,
                     null /*Declared licenses*/,
-                    license,
+                    declaredLicense,
                     downloadLocation,
                     new SpdxFile[]{} /*Files*/,
                     new SpdxPackageVerificationCode(name, new String[]{}));

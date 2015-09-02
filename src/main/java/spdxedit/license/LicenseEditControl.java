@@ -58,7 +58,7 @@ public class LicenseEditControl {
 
     }
 
-    LicenseEditControl(SpdxDocumentContainer documentContainer, boolean showExtractLicenseButton) {
+    public LicenseEditControl(SpdxDocumentContainer documentContainer, boolean showExtractLicenseButton) {
         this.showExtractLicenseButton = showExtractLicenseButton;
         this.documentContainer = documentContainer;
     }

@@ -22,7 +22,7 @@ import java.util.Optional;
 public class PackageVerificationCodeTest {
 
     @Test
-    public void oneFilePackageTest() throws URISyntaxException, InvalidSPDXAnalysisException, IOException{
+    public void oneFilePackageTest() throws URISyntaxException, InvalidSPDXAnalysisException, IOException {
         SpdxPackage pkg = new SpdxPackage("Dummy name", ListedLicenses.getListedLicenses().getListedLicenseById("GPL-2.0"),
                 new AnyLicenseInfo[]{} /* Licences from files*/,
                 null /*Declared licenses*/,
@@ -40,21 +40,17 @@ public class PackageVerificationCodeTest {
         Assert.assertEquals(expectedPackageVerificationCode, pkg.getPackageVerificationCode().getValue());
 
 
-
     }
 
     @Test
-    public void twoFilePackageTest() throws URISyntaxException {
+    public void twoFilePackageTest() throws URISyntaxException, InvalidSPDXAnalysisException {
         Path directoryPath = Paths.get(this.getClass().getClassLoader().getResource("hashTestFiles").toURI());
-        SpdxPackage pkg = SpdxLogic.createSpdxPackageForPath(Optional.of(directoryPath), "GPL-2.0", "FOO", "NO COMMENT", true);
+        SpdxPackage pkg = SpdxLogic.createSpdxPackageForPath(Optional.of(directoryPath), ListedLicenses.getListedLicenses().getListedLicenseById("GPL-2.0"), "FOO", "NO COMMENT", true);
         String actualVerificationCode = SpdxLogic.computePackageVerificationCode(pkg);
         final String expectedVerificationCode = "36b3d9fdaae5c74d3bc5528c28695236cc54dfd2";
         Assert.assertEquals(expectedVerificationCode, actualVerificationCode);
         SpdxLogic.recomputeVerificationCode(pkg);
-        try {
-            Assert.assertEquals(expectedVerificationCode, pkg.getPackageVerificationCode().getValue());
-        } catch (Exception e){
-            throw new RuntimeException(e);
-        }
+        Assert.assertEquals(expectedVerificationCode, pkg.getPackageVerificationCode().getValue());
+
     }
 }

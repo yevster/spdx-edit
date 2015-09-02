@@ -1,17 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.Pane?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="446.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
-    <Button fx:id="ok" defaultButton="true" layoutX="520.0" layoutY="392.0" mnemonicParsing="false" text="OK" />
-    <Button fx:id="cancel" cancelButton="true" layoutX="452.0" layoutY="392.0" mnemonicParsing="false" text="Cancel" />
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="704.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+    <Button fx:id="ok" defaultButton="true" layoutX="636.0" layoutY="549.0" mnemonicParsing="false" text="OK" />
+    <Button fx:id="cancel" cancelButton="true" layoutX="557.0" layoutY="549.0" mnemonicParsing="false" text="Cancel" />
     <Label layoutX="36.0" layoutY="43.0" text="Name" />
-    <Label layoutX="36.0" layoutY="78.0" text="License" />
-    <TextField fx:id="name" layoutX="111.0" layoutY="38.0" prefHeight="31.0" prefWidth="245.0" />
-    <ComboBox fx:id="licenseSelection" layoutX="111.0" layoutY="73.0" prefHeight="31.0" prefWidth="245.0" />
-    <TextArea fx:id="downloadLocation" layoutX="36.0" layoutY="136.0" prefHeight="210.0" prefWidth="446.0" />
-    <Label layoutX="36.0" layoutY="116.0" text="Download Location" />
-    <CheckBox fx:id="chkOmitHiddenFiles" layoutX="111.0" layoutY="364.0" mnemonicParsing="false" selected="true" text="Omit Hidden Files" />
-    <CheckBox fx:id="chkRemotePackage" layoutX="311.0" layoutY="364.0" mnemonicParsing="false" selected="false" text="External Package" />
+    <TextField fx:id="name" layoutX="111.0" layoutY="38.0" prefHeight="31.0" prefWidth="336.0" />
+    <TextArea fx:id="downloadLocation" layoutX="36.0" layoutY="118.0" prefHeight="69.0" prefWidth="637.0" />
+    <Label layoutX="36.0" layoutY="88.0" text="Download Location" />
+    <CheckBox fx:id="chkOmitHiddenFiles" layoutX="43.0" layoutY="553.0" mnemonicParsing="false" selected="true" text="Omit Hidden Files" />
+    <CheckBox fx:id="chkRemotePackage" layoutX="220.0" layoutY="553.0" mnemonicParsing="false" selected="false" text="External Package" />
+   <TitledPane fx:id="paneDeclaredLicense" alignment="TOP_LEFT" animated="false" collapsible="false" layoutX="36.0" layoutY="213.0" prefHeight="324.0" prefWidth="637.0" text="License">
+     <content>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="175.0" prefWidth="658.0" />
+     </content>
+   </TitledPane>
 </Pane>
