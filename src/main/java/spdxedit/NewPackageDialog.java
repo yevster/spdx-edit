@@ -104,7 +104,7 @@ public class NewPackageDialog {
         assert chkRemotePackage != null : "fx:id=\"chkRemotePackage\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
         assert paneDeclaredLicense != null : "fx:id=\"paneDeclaredLicense\" was not injected: check your FXML file 'NewPackageDialog.fxml'.";
 
-        declaredLicenseEdit = new LicenseEditControl(this.documentContainer, false);
+        declaredLicenseEdit = new LicenseEditControl(this.documentContainer, null, false);
         paneDeclaredLicense.setContent(declaredLicenseEdit.getUi());
 
 

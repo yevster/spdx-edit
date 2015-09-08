@@ -1,4 +1,6 @@
-
+/*
+SPDX-License-Identifier: Apache-2.0
+ */
 package spdxedit.license;
 
 import javafx.fxml.FXML;
@@ -6,9 +8,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.util.StringConverter;
+import org.apache.commons.lang3.StringUtils;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.*;
+import org.spdx.rdfparser.model.SpdxFile;
 
 import java.io.IOException;
 import java.net.URL;
@@ -21,6 +26,8 @@ import java.util.stream.Collectors;
 public class LicenseEditControl {
 
     private SpdxDocumentContainer documentContainer;
+
+    private SpdxFile file;
 
     private AnyLicenseInfo initialValue = new SpdxNoAssertionLicense();
 
@@ -55,12 +62,14 @@ public class LicenseEditControl {
 
     @FXML
     void handleBtnNewFromFileClick(MouseEvent event) {
-
+        FileLicenseEditor.extractLicenseFromFile(file, documentContainer);
+        refreshExtractedLicenses();
     }
 
-    public LicenseEditControl(SpdxDocumentContainer documentContainer, boolean showExtractLicenseButton) {
+    public LicenseEditControl(SpdxDocumentContainer documentContainer, SpdxFile file, boolean showExtractLicenseButton) {
         this.showExtractLicenseButton = showExtractLicenseButton;
         this.documentContainer = documentContainer;
+        this.file = file;
     }
 
     @FXML
@@ -86,6 +95,17 @@ public class LicenseEditControl {
         rdoExtracted.selectedProperty().addListener((observable, oldValue, newValue) -> chcExtractedLicenses.setDisable(!newValue));
 
         chcListedLicense.getItems().addAll(Arrays.stream(ListedLicenses.getListedLicenses().getSpdxListedLicenseIds()).sorted().collect(Collectors.toList()));
+        chcExtractedLicenses.setConverter(new StringConverter<ExtractedLicenseInfo>() {
+            @Override
+            public String toString(ExtractedLicenseInfo object) {
+                return object.getName();
+            }
+
+            @Override
+            public ExtractedLicenseInfo fromString(String string) {
+                return Arrays.stream(documentContainer.getExtractedLicenseInfos()).filter(license -> StringUtils.equals(license.getName(), string)).findAny().get();
+            }
+        });
 
         btnNewFromFile.setVisible(showExtractLicenseButton);
 
@@ -95,8 +115,7 @@ public class LicenseEditControl {
             chcListedLicense.setDisable(false);
             rdoStandard.selectedProperty().setValue(true);
         } else if (initialValue instanceof ExtractedLicenseInfo) {
-            chcExtractedLicenses.getItems().clear();
-            chcExtractedLicenses.getItems().addAll(Arrays.stream(documentContainer.getExtractedLicenseInfos()).collect(Collectors.toList()));
+            refreshExtractedLicenses();
             chcExtractedLicenses.setValue((ExtractedLicenseInfo) initialValue);
             chcExtractedLicenses.setDisable(false);
             rdoExtracted.selectedProperty().setValue(true);
@@ -108,6 +127,12 @@ public class LicenseEditControl {
             new Alert(Alert.AlertType.ERROR, "Unsupported license type: " + initialValue.getClass().getSimpleName() + ".", ButtonType.OK);
         }
 
+    }
+
+
+    private void refreshExtractedLicenses(){
+        chcExtractedLicenses.getItems().clear();
+        chcExtractedLicenses.getItems().addAll(Arrays.stream(documentContainer.getExtractedLicenseInfos()).collect(Collectors.toList()));
     }
 
 

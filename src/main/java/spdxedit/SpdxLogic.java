@@ -13,7 +13,7 @@ import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
-import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
@@ -154,6 +154,7 @@ public class SpdxLogic {
             throw new RuntimeException(e);
         }
     }
+
 
     public static SpdxFile addFileToPackage(SpdxPackage pkg, Path newFilePath, String baseUri) {
         try {
@@ -382,6 +383,38 @@ public class SpdxLogic {
         try {
             return ArrayUtils.contains(pkg.getPackageVerificationCode().getExcludedFileNames(), file.getName());
         } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Finds an extracted license in the document with the provided name and text.
+     * @param container
+     * @param name
+     * @param text
+     * @return
+     */
+    public static Optional<? extends ExtractedLicenseInfo> findExtractedLicenseByNameAndText(SpdxDocumentContainer container, String name, String text){
+       return Arrays.stream(container.getExtractedLicenseInfos())
+                .filter(license -> StringUtils.equals(license.getName(), name))
+                .filter(license -> StringUtils.equals(license.getExtractedText(), text))
+                .findAny();
+
+    }
+
+    /**
+     * Adds an extracted license from a file to that file and the SPDX document container.
+     * Does not verify prior existence of the license in file or document.
+     * @param spdxFile
+     * @param documentContainer
+     */
+    public static void addExtractedLicenseFromFile(SpdxFile spdxFile, SpdxDocumentContainer documentContainer, String licenseName, String licenseText){
+        ExtractedLicenseInfo newLicense = new ExtractedLicenseInfo(licenseName+licenseText.hashCode(), licenseText);
+        newLicense.setName(licenseName);
+        try{
+            spdxFile.setLicenseInfosFromFiles(ArrayUtils.add(spdxFile.getLicenseInfoFromFiles(), newLicense));
+            documentContainer.setExtractedLicenseInfos(ArrayUtils.add(documentContainer.getExtractedLicenseInfos(), newLicense));
+        }  catch (InvalidSPDXAnalysisException e){
             throw new RuntimeException(e);
         }
     }
