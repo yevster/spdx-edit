@@ -6,3 +6,7 @@ SpdxEdit uses [Spdx Tools](https://github.com/spdx/tools) to read, edit, and wri
 SpdxEdit requires [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html).
 
 SpdxEdit is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
+
+###Known limitations:
+Only one extracted license per file is supported (SPDX spec supports unlimited).
+Standard licenses found in files not presently supported
