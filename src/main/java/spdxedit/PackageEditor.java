@@ -27,6 +27,8 @@ import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.license.FileLicenseEditor;
+import spdxedit.license.LicenseEditControl;
+import spdxedit.license.SpdxWithoutExeption;
 import spdxedit.util.StringableWrapper;
 
 import java.io.File;
@@ -121,6 +123,23 @@ public class PackageEditor {
 
     @FXML
     private Button btnRemoveRelationship;
+
+    /**
+     * PACKAGE LICENSE EDITOR
+     */
+
+    @FXML
+    private Tab tabPkgDeclaredLicense;
+
+    @FXML
+    private Tab tabPkgConcludedLicense;
+
+    @FXML
+    private TitledPane tabPkgLicenses;
+
+    private LicenseEditControl pkgDeclaredLicenseEdit;
+
+    private LicenseEditControl pkgConcludedLicenseEdit;
 
 
     @FXML
@@ -219,6 +238,20 @@ public class PackageEditor {
         chcNewRelationshipType.getSelectionModel().selectFirst();
         assert (otherPackages != null); //Constructor finished executing
         lstTargetPackages.getItems().setAll(otherPackages);
+
+        //Package license editor
+        assert tabPkgLicenses != null : "fx:id=\"tabPkgLicenses\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert tabPkgDeclaredLicense != null : "fx:id=\"tabPkgDeclaredLicense\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert tabPkgConcludedLicense != null : "fx:id=\"tabPkgConcludedLicense\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+
+        pkgConcludedLicenseEdit = new LicenseEditControl(documentContainer);
+        pkgConcludedLicenseEdit.setInitialValue(pkg.getLicenseConcluded());
+        pkgConcludedLicenseEdit.setOnLicenseChange(license -> SpdxWithoutExeption.setLicenseConcluded(pkg, license));
+        tabPkgConcludedLicense.setContent(pkgConcludedLicenseEdit.getUi());
+        pkgDeclaredLicenseEdit = new LicenseEditControl(documentContainer);
+        pkgDeclaredLicenseEdit.setInitialValue(SpdxWithoutExeption.getLicenseDeclared(pkg));
+        pkgDeclaredLicenseEdit.setOnLicenseChange(license -> SpdxWithoutExeption.setLicenseDeclared(pkg, license));
+        tabPkgDeclaredLicense.setContent(pkgDeclaredLicenseEdit.getUi());
 
         //Initialize other elements
         tblColumnFile.setCellValueFactory(

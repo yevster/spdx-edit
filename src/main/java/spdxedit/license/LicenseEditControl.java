@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.license.*;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 
 import java.io.IOException;
@@ -20,6 +21,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -60,12 +63,29 @@ public class LicenseEditControl {
     @FXML
     private Button btnNewFromFile;
 
+    private Consumer<AnyLicenseInfo> onLicenseChange;
+
     @FXML
     void handleBtnNewFromFileClick(MouseEvent event) {
         FileLicenseEditor.extractLicenseFromFile(file, documentContainer);
         refreshExtractedLicenses();
     }
 
+
+    /**
+     * Creates a new control without an exstract license button.
+     * @param documentContainer
+     */
+   public LicenseEditControl(SpdxDocumentContainer documentContainer){
+       this(documentContainer, null, false);
+   }
+
+    /**
+     *
+     * @param documentContainer
+     * @param file File from which to extract the license if Extract License button is clicked.
+     * @param showExtractLicenseButton
+     */
     public LicenseEditControl(SpdxDocumentContainer documentContainer, SpdxFile file, boolean showExtractLicenseButton) {
         this.showExtractLicenseButton = showExtractLicenseButton;
         this.documentContainer = documentContainer;
@@ -89,6 +109,7 @@ public class LicenseEditControl {
         rdoStandard.setToggleGroup(licenseTypeGroup);
         rdoNone.setToggleGroup(licenseTypeGroup);
         rdoNoAssert.setToggleGroup(licenseTypeGroup);
+
 
         //Choice boxes should disable when their respective radio buttons are untoggled.
         rdoStandard.selectedProperty().addListener((observable, oldValue, newValue) -> chcListedLicense.setDisable(!newValue));
@@ -127,6 +148,11 @@ public class LicenseEditControl {
             new Alert(Alert.AlertType.ERROR, "Unsupported license type: " + initialValue.getClass().getSimpleName() + ".", ButtonType.OK);
         }
 
+        //Listen for change events
+
+        licenseTypeGroup.selectedToggleProperty().addListener((observable1, oldValue1, newValue1) -> {hanldLicenseChangeEvent();});
+        chcExtractedLicenses.valueProperty().addListener((observable, oldValue, newValue) -> {hanldLicenseChangeEvent();});
+        chcListedLicense.valueProperty().addListener((observable, oldValue, newValue) -> {hanldLicenseChangeEvent();});
     }
 
 
@@ -175,6 +201,19 @@ public class LicenseEditControl {
             return pane;
         } catch (IOException ioe) {
             throw new RuntimeException("Unable to load scene for License editor dialog");
+        }
+    }
+
+    public void setOnLicenseChange(Consumer<AnyLicenseInfo> onLicenseChange){
+        this.onLicenseChange = onLicenseChange;
+    }
+
+    /**
+     * Catchall handler for all license change events.
+     */
+    private void hanldLicenseChangeEvent(){
+        if (this.onLicenseChange != null){
+            this.onLicenseChange.accept(getValue());
         }
     }
 

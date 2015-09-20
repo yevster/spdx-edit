@@ -7,16 +7,38 @@
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.PropertySheet?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="558.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
 
 
-    <Accordion maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1020.0">
+    <Accordion maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="533.0" prefWidth="1020.0">
         <panes>
          <TitledPane fx:id="tabPackageProperties" animated="false" text="Package">
            <content>
              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                   <children>
                      <PropertySheet fx:id="pkgPropertySheet" layoutX="1.0" layoutY="-1.0" prefHeight="348.0" prefWidth="937.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  </children>
+               </AnchorPane>
+           </content>
+         </TitledPane>
+         <TitledPane fx:id="tabPkgLicenses" animated="false" prefHeight="422.0" prefWidth="1029.0" text="Package License">
+           <content>
+             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                  <children>
+                     <TabPane prefHeight="392.0" prefWidth="1020.0" tabClosingPolicy="UNAVAILABLE">
+                       <tabs>
+                         <Tab fx:id="tabPkgDeclaredLicense" text="Declared License">
+                           <content>
+                             <AnchorPane fx:id="tabDeclaredLicense" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                           </content>
+                         </Tab>
+                         <Tab fx:id="tabPkgConcludedLicense" text="Concluded License">
+                           <content>
+                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                           </content>
+                         </Tab>
+                       </tabs>
+                     </TabPane>
                   </children>
                </AnchorPane>
            </content>
@@ -64,6 +86,6 @@
             </TitledPane>
         </panes>
     </Accordion>
-    <Button fx:id="btnOk" defaultButton="true" layoutX="913.0" layoutY="511.0" mnemonicParsing="false" text="OK" />
+    <Button fx:id="btnOk" defaultButton="true" layoutX="949.0" layoutY="554.0" mnemonicParsing="false" text="OK" />
 
 </Pane>
