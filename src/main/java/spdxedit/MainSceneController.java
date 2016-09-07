@@ -219,7 +219,7 @@ public class MainSceneController {
         File targetFile = getSpdxFileChooser("spdx","tag").showOpenDialog(saveSpdx.getScene().getWindow());
         try(FileInputStream in = new FileInputStream(targetFile)){
             List<String> warnings = new LinkedList<>();
-            SpdxDocumentContainer container = TagToRDF.convertTatFileToRdf(in, "RDF/XML", warnings);
+            SpdxDocumentContainer container = TagToRDF.convertTagFileToRdf(in, "RDF/XML", warnings);
             if (warnings.size()>0){
                 Alert warningsAlert = new Alert(Alert.AlertType.WARNING, "Warnings occured in parsing Tag document", ButtonType.OK);
                 TextArea warningList = new TextArea();

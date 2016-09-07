@@ -198,12 +198,12 @@ public class PackageEditor {
 
         //Initialise file relationship checkbox handling
         //TODO: Could make this easier by extending the CheckBox control?
-        chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_dataFile, newValue));
-        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_testcaseOf, newValue));
-        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_documentation, newValue));
-        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_optionalComponentOf, newValue));
-        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_metafileOf, newValue));
-        chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.relationshipType_buildToolOf, newValue));
+        chkDataFile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.DATA_FILE_OF, newValue));
+        chkTestCase.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.TEST_CASE_OF, newValue));
+        chkDocumentation.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.DOCUMENTATION_OF, newValue));
+        chkOptionalComponent.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.OPTIONAL_COMPONENT_OF, newValue));
+        chkMetafile.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.METAFILE_OF, newValue));
+        chkBuildTool.selectedProperty().addListener((observable, oldValue, newValue) -> addOrRemoveFileRelationshipToPackage(RelationshipType.BUILD_TOOL_OF, newValue));
         chkExcludeFile.selectedProperty().addListener((observable, oldValue, newValue) -> handleChkExcludeFileChange(newValue));
 
         //Package relationship controls
@@ -227,13 +227,11 @@ public class PackageEditor {
         //Package relationship types
         chcNewRelationshipType.setConverter(RELATIONSHIP_TYPE_STRING_CONVERTER);
         chcNewRelationshipType.getItems().setAll(
-                Stream.of(RelationshipType.relationshipType_dynamicLink,
-                        RelationshipType.relationshipType_staticLink,
-                        RelationshipType.relationshipType_generatedFrom,
-                        RelationshipType.relationshipType_generates,
-                        RelationshipType.relationshipType_hasPrerequisite,
-                        RelationshipType.relationshipType_prerequisiteFor,
-                        RelationshipType.relationshipType_other)
+                Stream.of(RelationshipType.DYNAMIC_LINK,
+                        RelationshipType.STATIC_LINK,
+                        RelationshipType.GENERATED_FROM,
+                        RelationshipType.GENERATES,
+                        RelationshipType.OTHER)
                         .collect(Collectors.toList()));
         chcNewRelationshipType.getSelectionModel().selectFirst();
         assert (otherPackages != null); //Constructor finished executing
@@ -361,12 +359,12 @@ public class PackageEditor {
 
 
             //Reset the relationship checkboxes
-            chkDataFile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_dataFile, pkg).isPresent());
-            chkTestCase.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_testcaseOf, pkg).isPresent());
-            chkDocumentation.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_documentation, pkg).isPresent());
-            chkMetafile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_metafileOf, pkg).isPresent());
-            chkOptionalComponent.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_optionalComponentOf, pkg).isPresent());
-            chkBuildTool.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.relationshipType_buildToolOf, pkg).isPresent());
+            chkDataFile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.DATA_FILE_OF, pkg).isPresent());
+            chkTestCase.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.TEST_CASE_OF, pkg).isPresent());
+            chkDocumentation.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.DOCUMENTATION_OF, pkg).isPresent());
+            chkMetafile.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.METAFILE_OF, pkg).isPresent());
+            chkOptionalComponent.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.OPTIONAL_COMPONENT_OF, pkg).isPresent());
+            chkBuildTool.setSelected(SpdxLogic.findRelationship(newSelection.getValue(), RelationshipType.BUILD_TOOL_OF, pkg).isPresent());
 
             chkExcludeFile.setSelected(SpdxLogic.isFileExcludedFromVerification(pkg, newSelection.getValue()));
 
