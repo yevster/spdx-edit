@@ -291,6 +291,8 @@ public class PackageEditor {
             Pane pane = loader.load();
             Scene scene = new Scene(pane);
             dialogStage.setScene(scene);
+            dialogStage.getIcons().clear();
+            dialogStage.getIcons().add(UiUtils.ICON_IMAGE_VIEW.getImage());
             //Populate the file list on appearance
             dialogStage.setOnShown(event ->
             {
@@ -460,9 +462,9 @@ public class PackageEditor {
     public void handleBtnCopyrightClick(MouseEvent event){
         String oldCopyright = currentFile.getCopyrightText();
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle(currentFile.getName() + " copyright");
+        dialog.setTitle("Copyright");
         dialog.setHeaderText("Enter the copyright text");
-        dialog.setContentText(oldCopyright);
+        ((Stage)dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
         Optional<String> newCopyrightText = dialog.showAndWait();
         if (newCopyrightText.isPresent()){
             currentFile.setCopyrightText(newCopyrightText.get());

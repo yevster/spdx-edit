@@ -8,13 +8,16 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    public static final String APP_TITLE="SPDX Edit";
+    public static final String APP_TITLE = "SPDX Edit";
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/MainScene.fxml"));
         primaryStage.setTitle(APP_TITLE);
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        primaryStage.getIcons().clear();
+        primaryStage.getIcons().add(UiUtils.ICON_IMAGE_VIEW.getImage());
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 

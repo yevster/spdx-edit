@@ -12,13 +12,11 @@ import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.SpdxDocumentContainer;
-import org.spdx.rdfparser.license.ListedLicenses;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.license.LicenseEditControl;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Optional;
 
 public class NewPackageDialog {
@@ -57,7 +55,6 @@ public class NewPackageDialog {
         final NewPackageDialog controller = new NewPackageDialog(path, documentContainer);
         final Stage dialogStage = new Stage();
         dialogStage.setTitle("Create SPDX Package");
-        dialogStage.initStyle(StageStyle.UTILITY);
         dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setY(parentWindow.getX() + parentWindow.getWidth() / 2);
         dialogStage.setY(parentWindow.getY() + parentWindow.getHeight() / 2);
@@ -66,6 +63,8 @@ public class NewPackageDialog {
             loader.setController(controller);
             Pane pane = loader.load();
             Scene scene = new Scene(pane);
+            dialogStage.getIcons().clear();
+            dialogStage.getIcons().add(UiUtils.ICON_IMAGE_VIEW.getImage());
             dialogStage.setScene(scene);
             dialogStage.setOnShown(event -> {
                 if (path.isPresent()) {
