@@ -18,9 +18,13 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
+import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
+import org.spdx.rdfparser.referencetype.ReferenceType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -28,6 +32,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SpdxLogic {
+
+
 	private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
 
 	public static SpdxDocument createEmptyDocument(String uri) {
@@ -457,6 +463,15 @@ public class SpdxLogic {
 			documentContainer
 					.setExtractedLicenseInfos(ArrayUtils.add(documentContainer.getExtractedLicenseInfos(), newLicense));
 		} catch (InvalidSPDXAnalysisException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static ReferenceType getReferenceType(String string){
+		try {
+			URI uri = new URI(string);
+			return new ReferenceType(uri, null, null, null);
+		} catch (URISyntaxException | InvalidSPDXAnalysisException e){
 			throw new RuntimeException(e);
 		}
 	}

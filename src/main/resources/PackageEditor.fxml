@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import org.controlsfx.control.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Accordion?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 <?import org.controlsfx.control.CheckListView?>
 <?import org.controlsfx.control.PropertySheet?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="601.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="624.0" prefWidth="1020.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
 
 
-    <Accordion maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="533.0" prefWidth="1020.0">
+    <Accordion maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="564.0" prefWidth="1020.0">
         <panes>
          <TitledPane fx:id="tabPackageProperties" animated="false" text="Package">
            <content>
@@ -84,8 +93,9 @@
                     </AnchorPane>
                 </content>
             </TitledPane>
+         <TitledPane fx:id="tabExternalRefs" prefHeight="457.0" prefWidth="1020.0" text="External References" />
         </panes>
     </Accordion>
-    <Button fx:id="btnOk" defaultButton="true" layoutX="949.0" layoutY="554.0" mnemonicParsing="false" text="OK" />
+    <Button fx:id="btnOk" defaultButton="true" layoutX="973.0" layoutY="585.0" mnemonicParsing="false" text="OK" />
 
 </Pane>

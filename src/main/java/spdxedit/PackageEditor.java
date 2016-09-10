@@ -6,6 +6,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -26,6 +27,7 @@ import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
 import org.spdx.rdfparser.model.SpdxPackage;
+import spdxedit.externalRef.ExternalRefListControl;
 import spdxedit.license.FileLicenseEditor;
 import spdxedit.license.LicenseEditControl;
 import spdxedit.license.SpdxWithoutExeption;
@@ -80,6 +82,11 @@ public class PackageEditor {
 
     @FXML
     private PropertySheet pkgPropertySheet;
+
+
+    @FXML
+    private TitledPane tabExternalRefs;
+
 
     /***
      * FILE INFORMATION REPRESENTATIONS
@@ -175,6 +182,7 @@ public class PackageEditor {
     private void initialize() {
         assert tabFiles != null : "fx:id=\"tabFiles\" was not injected: check your FXML file 'PackageEditor.fxml'.";
         assert tabPackageProperties != null : "fx:id=\"tabPackageProperties\" was not injected: check your FXML file 'PackageEditor.fxml'.";
+        assert tabExternalRefs != null : "fx:id=\"tabExternalRefs\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
 
         assert filesTable != null : "fx:id=\"filesTable\" was not injected: check your FXML file 'PackageEditor.fxml'.";
@@ -264,6 +272,9 @@ public class PackageEditor {
         filesTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFileSelected(newValue));
         filesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         filesTable.setShowRoot(false);
+
+        Node externalRefControl = new ExternalRefListControl(pkg).getUi();
+        tabExternalRefs.setContent(externalRefControl);
 
 
     }
