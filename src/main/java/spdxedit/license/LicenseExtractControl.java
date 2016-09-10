@@ -8,6 +8,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -17,6 +18,10 @@ import java.util.Objects;
  */
 public class LicenseExtractControl {
 
+
+    @FXML
+    private TextField txtLicenseId;
+
     @FXML
     private TextField txtLicenseName;
 
@@ -25,39 +30,49 @@ public class LicenseExtractControl {
 
     private String initialNameValue;
     private String initialTextValue;
+    private String initialLicenseId;
 
 
     /**
      * Creates a new LicenseExtractControl.
+     *
      * @param initialNameValue
      * @param initialTextValue
+     * @param initialLicenseId
      */
-    public LicenseExtractControl(String initialNameValue, String initialTextValue){
+    public LicenseExtractControl(String initialNameValue, String initialTextValue, String initialLicenseId) {
         this.initialNameValue = initialNameValue;
         this.initialTextValue = initialTextValue;
+        this.initialLicenseId = initialLicenseId;
     }
-
 
 
     @FXML
     void initialize() {
         assert txtLicenseName != null : "fx:id=\"txtLicenseName\" was not injected: check your FXML file 'extractLicenseDialog.fxml'.";
         assert txtLicenseText != null : "fx:id=\"txtLicenseText\" was not injected: check your FXML file 'extractLicenseDialog.fxml'.";
+        assert initialLicenseId != null : "fx:id=\"initialLicenseId\" was not injected: check your FXML file 'extractLicenseDialog.fxml'.";
         txtLicenseName.setText(initialNameValue);
         txtLicenseText.setText(initialTextValue);
+        txtLicenseId.setText(StringUtils.removeStart(initialLicenseId, "LicenseRef-"));
+
+    }
+
+    public String getLicenseId() {
+        return "LicenseRef-" + Objects.requireNonNull(txtLicenseId).getText();
     }
 
     /**
      * Returns the selected license name. Throws {@link NullPointerException} if called before the control has been initialized.
      */
-    public String getLicenseName(){
+    public String getLicenseName() {
         return Objects.requireNonNull(txtLicenseName).getText();
     }
 
     /**
      * Returns the selected license text. Throws {@link NullPointerException} if called before the control has been initialized.
      */
-    public String getLicenseText(){
+    public String getLicenseText() {
         return Objects.requireNonNull(txtLicenseText).getText();
     }
 

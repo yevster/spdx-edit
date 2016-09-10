@@ -60,24 +60,28 @@ public class FileLicenseEditor {
         dialog.setGraphic(new ImageView(FileLicenseEditor.class.getResource("/img/document-8x.png").toString()));
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CANCEL, ButtonType.OK);
 
-        String licenseName = "NOASSERTION";
+        String licenseName = "";
         String licenseText = null;
+        String licenseId = "";
         //TODO: Add support for multiple extracted licenses.
         if (file.getLicenseInfoFromFiles()!= null && file.getLicenseInfoFromFiles().length > 0){
             Optional<AnyLicenseInfo> foundExtractedLicense = Arrays.stream(file.getLicenseInfoFromFiles()).filter(license -> license instanceof ExtractedLicenseInfo).findFirst();
             if (foundExtractedLicense.isPresent()){
                 licenseName = ((ExtractedLicenseInfo)foundExtractedLicense.get()).getName();
                 licenseText = ((ExtractedLicenseInfo)foundExtractedLicense.get()).getExtractedText();
+                licenseId = ((ExtractedLicenseInfo)foundExtractedLicense.get()).getLicenseId();
+
             }
         }
 
-        LicenseExtractControl licenseExtractControl = new LicenseExtractControl(licenseName, licenseText);
+        LicenseExtractControl licenseExtractControl = new LicenseExtractControl(licenseName, licenseText, licenseId);
 
         dialog.getDialogPane().setContent(licenseExtractControl.getUi());
         Optional<ButtonType> result = dialog.showAndWait();
 
         licenseName = licenseExtractControl.getLicenseName();
         licenseText = licenseExtractControl.getLicenseText();
+        licenseId = licenseExtractControl.getLicenseId();
 
         //No selection
         if (!result.isPresent() || result.get() == ButtonType.CANCEL) {
@@ -92,14 +96,23 @@ public class FileLicenseEditor {
             new Alert(Alert.AlertType.ERROR, "License text cannot be blank.", ButtonType.OK).showAndWait();
             return;
         }
+        if (StringUtils.isBlank(licenseId)){
+            new Alert(Alert.AlertType.ERROR, "License ID cannot be blank.", ButtonType.OK).showAndWait();
+            return;
+        }
         //License already extracted
         if (SpdxLogic.findExtractedLicenseByNameAndText(container, licenseName, licenseText).isPresent()){
             new Alert(Alert.AlertType.WARNING, "License "+licenseName+" with the same text has already been extracted.", ButtonType.OK).showAndWait();
             return;
         }
+        //License with ID already exists
+        if (SpdxLogic.findExtractedLicenseInfoById(container, licenseId).isPresent()){
+            new Alert(Alert.AlertType.WARNING, "License with ID "+licenseId+" already exists.", ButtonType.OK).showAndWait();
+            return;
+        }
 
 
-        SpdxLogic.addExtractedLicenseFromFile(file, container, licenseName, licenseText);
+        SpdxLogic.addExtractedLicenseFromFile(file, container, licenseId, licenseName, licenseText);
 
 
     }

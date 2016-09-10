@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import java.lang.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
 
-<GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" vgap="10.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.40">
+<GridPane hgap="5.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" vgap="15.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
   <columnConstraints>
-    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="108.0" />
-    <ColumnConstraints hgrow="SOMETIMES" maxWidth="483.0" minWidth="10.0" prefWidth="482.0" />
+    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="291.0" minWidth="10.0" prefWidth="95.0" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="487.0" minWidth="10.0" prefWidth="480.0" />
   </columnConstraints>
   <rowConstraints>
+      <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
     <RowConstraints maxHeight="189.0" minHeight="10.0" prefHeight="43.0" vgrow="SOMETIMES" />
     <RowConstraints maxHeight="350.0" minHeight="10.0" prefHeight="347.0" valignment="BASELINE" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <Label text="License Name:" textAlignment="RIGHT" />
-      <TextField fx:id="txtLicenseName" promptText="License Name" GridPane.columnIndex="1" />
-      <Label text="License Text:" GridPane.rowIndex="1" />
-      <TextArea fx:id="txtLicenseText" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Label text="License Name:" textAlignment="RIGHT" GridPane.rowIndex="1" />
+      <TextField fx:id="txtLicenseName" promptText="License Name" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Label text="License Text:" GridPane.rowIndex="2" />
+      <TextArea fx:id="txtLicenseText" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Label text="License ID:" />
+      <BorderPane prefHeight="29.0" prefWidth="480.0" GridPane.columnIndex="1">
+         <left>
+            <Label text="LicenseRef-" BorderPane.alignment="CENTER" />
+         </left>
+         <center>
+            <TextField fx:id="txtLicenseId" BorderPane.alignment="CENTER" />
+         </center>
+      </BorderPane>
    </children>
    <padding>
-      <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
 </GridPane>

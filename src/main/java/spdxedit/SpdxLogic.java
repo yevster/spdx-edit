@@ -433,6 +433,14 @@ public class SpdxLogic {
 	}
 
 	/**
+	 * Finds an extracted license in the document with the provided license ID
+	 */
+	public static Optional<? extends ExtractedLicenseInfo> findExtractedLicenseInfoById(SpdxDocumentContainer container, String licenseId){
+		Objects.requireNonNull(licenseId);
+		return Arrays.stream(container.getExtractedLicenseInfos()).filter(license -> licenseId.equals(license.getLicenseId())).findAny();
+	}
+
+	/**
 	 * Adds an extracted license from a file to that file and the SPDX document
 	 * container. Does not verify prior existence of the license in file or
 	 * document.
@@ -441,8 +449,8 @@ public class SpdxLogic {
 	 * @param documentContainer
 	 */
 	public static void addExtractedLicenseFromFile(SpdxFile spdxFile, SpdxDocumentContainer documentContainer,
-			String licenseName, String licenseText) {
-		ExtractedLicenseInfo newLicense = new ExtractedLicenseInfo(licenseName + licenseText.hashCode(), licenseText);
+			String licenseId, String licenseName, String licenseText) {
+		ExtractedLicenseInfo newLicense = new ExtractedLicenseInfo(licenseId, licenseText);
 		newLicense.setName(licenseName);
 		try {
 			spdxFile.setLicenseInfosFromFiles(ArrayUtils.add(spdxFile.getLicenseInfoFromFiles(), newLicense));

@@ -14,7 +14,7 @@
     <TextArea fx:id="downloadLocation" layoutX="36.0" layoutY="118.0" prefHeight="69.0" prefWidth="637.0" />
     <Label layoutX="36.0" layoutY="88.0" text="Download Location" />
     <CheckBox fx:id="chkOmitHiddenFiles" layoutX="43.0" layoutY="553.0" mnemonicParsing="false" selected="true" text="Omit Hidden Files" />
-    <CheckBox fx:id="chkRemotePackage" layoutX="220.0" layoutY="553.0" mnemonicParsing="false" selected="false" text="External Package" />
+    <CheckBox fx:id="chkRemotePackage" layoutX="220.0" layoutY="553.0" mnemonicParsing="false" selected="false" text="Omit Files" />
    <TitledPane fx:id="paneDeclaredLicense" alignment="TOP_LEFT" animated="false" collapsible="false" layoutX="36.0" layoutY="213.0" prefHeight="324.0" prefWidth="637.0" text="License">
      <content>
        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="175.0" prefWidth="658.0" />
