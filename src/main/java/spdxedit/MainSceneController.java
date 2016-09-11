@@ -12,6 +12,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -272,8 +273,8 @@ public class MainSceneController {
 
             // Set expandable Exception into the dialog pane.
             alert.getDialogPane().setContent(validationCongtent);
-
         }
+        ((Stage)alert.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
         alert.showAndWait();
     }
 

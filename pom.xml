@@ -87,9 +87,9 @@
 			<version>2.1.0</version> </dependency> -->
 
 		<dependency>
-			<groupId>com.github.spdx</groupId>
+			<groupId>com.github.yevster</groupId>
 			<artifactId>tools</artifactId>
-			<version>-SNAPSHOT</version>
+			<version>-v2.1.0-gb9b3929-3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.controlsfx</groupId>

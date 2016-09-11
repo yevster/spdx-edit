@@ -155,6 +155,7 @@ public class SpdxLogic {
 			} else {
 				//External package
 				pkg.setFilesAnalyzed(false);
+				pkg.setPackageVerificationCode(null);
 			}
 			return pkg;
 		} catch (InvalidSPDXAnalysisException | IOException e) {
