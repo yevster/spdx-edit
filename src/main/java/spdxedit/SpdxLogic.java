@@ -35,12 +35,13 @@ public class SpdxLogic {
 
 
 	private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
+	private static final String SPDX_SPEC_VERSION="SPDX-2.1";
 
 	public static SpdxDocument createEmptyDocument(String uri) {
 
 		SpdxDocumentContainer container = null;
 		try {
-			container = new SpdxDocumentContainer(uri, "SPDX-2.0");
+			container = new SpdxDocumentContainer(uri, SPDX_SPEC_VERSION);
 			container.getSpdxDocument().getCreationInfo().setCreators(new String[] { "Tool: SPDX Edit" });
 			return container.getSpdxDocument();
 		} catch (InvalidSPDXAnalysisException e) {
