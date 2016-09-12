@@ -3,6 +3,10 @@ package spdxedit;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.net.MediaType;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.ResIterator;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.impl.PropertyImpl;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +22,6 @@ import org.spdx.rdfparser.license.SpdxNoAssertionLicense;
 import org.spdx.rdfparser.model.*;
 import org.spdx.rdfparser.model.Relationship.RelationshipType;
 import org.spdx.rdfparser.model.SpdxFile.FileType;
-import org.spdx.rdfparser.referencetype.ListedReferenceTypes;
 import org.spdx.rdfparser.referencetype.ReferenceType;
 
 import java.io.IOException;
@@ -62,11 +65,19 @@ public class SpdxLogic {
 	}
 
 	public static Stream<SpdxPackage> getSpdxPackagesInDocument(SpdxDocument document) {
-		return Arrays.stream(document.getRelationships())
-				.filter(relationship -> relationship.getRelationshipType() == RelationshipType.DESCRIBES)
-				// Just in case
-				.filter(relationship -> relationship.getRelatedSpdxElement() instanceof SpdxPackage)
-				.map(relationship -> (SpdxPackage) relationship.getRelatedSpdxElement());
+        final Property rdfType = new PropertyImpl("http://www.w3.org/1999/02/22-rdf-syntax-ns#", "type");
+        final String packageTypeUri = "http://spdx.org/rdf/terms#Package";
+        ResIterator resIterator = document.getDocumentContainer().getModel().listResourcesWithProperty(rdfType, document.getDocumentContainer().getModel().getResource(packageTypeUri));
+        List<SpdxPackage> result = new LinkedList<SpdxPackage>();
+        try {
+            while (resIterator.hasNext()) {
+                Resource resource = resIterator.nextResource();
+                result.add(new SpdxPackage(document.getDocumentContainer(), resource.asNode()));
+            }
+            return result.stream();
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException(e);
+        }
 	}
 
 	public static SpdxDocument createDocumentWithPackages(Iterable<SpdxPackage> packages) {
