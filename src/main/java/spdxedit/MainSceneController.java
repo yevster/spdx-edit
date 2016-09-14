@@ -158,14 +158,15 @@ public class MainSceneController {
     }
 
     public void handleNewDocumentClicked(MouseEvent event){
-        TextInputDialog dialog = new TextInputDialog();
+        TextInputDialog dialog = new TextInputDialog("http://url.example.com/spdx/builder");
         ((Stage)dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
         dialog.setTitle("New SPDX Document");
         dialog.setHeaderText("Enter document namespace");
-        dialog.setResult("http://url.example.com/spdx/builder");
+
         Optional<String> result = dialog.showAndWait();
         while (result.isPresent() && !SpdxLogic.validateDocumentNamespace(result.orElse(""))){
-            dialog.setContentText(result.orElse("")+ "is not a valid document namespace. Please enter a valid document namespace.");
+
+            dialog.setHeaderText("Invalid document namespace. Enter new document namespace.");
             result = dialog.showAndWait();
         }
         if (result.isPresent()){
