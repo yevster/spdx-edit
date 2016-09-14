@@ -488,4 +488,17 @@ public class SpdxLogic {
 			throw new RuntimeException(e);
 		}
 	}
+    /**
+     * Verifies that the provided argument is a legal SPDX document namespace.
+     * @return  true if, and only, if the argument is a valid SPDX document namespace.
+     */
+	public static boolean validateDocumentNamespace(String namespace){
+        try {
+            return StringUtils.isNotBlank(namespace)
+                    && !StringUtils.contains(namespace, "#")
+                    && (new URI(namespace) != null);
+        } catch (URISyntaxException e){
+            return false;
+        }
+    }
 }

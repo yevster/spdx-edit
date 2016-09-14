@@ -57,9 +57,13 @@ public class MainSceneController {
     private Button validateSpdx;
 
     @FXML
+    private Button btnNewDocument;
+
+
+    @FXML
     private ListView<SpdxPackage> addedPackagesUiList;
 
-    private SpdxDocument documentToEdit = SpdxLogic.createEmptyDocument("http://url.example.com/spdx/builder");
+    private SpdxDocument documentToEdit = null;
 
     private static final Logger logger = LoggerFactory.getLogger(MainSceneController.class);
 
@@ -104,14 +108,25 @@ public class MainSceneController {
         assert dirTree != null : "fx:id=\"dirTree\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert chooseDir != null : "fx:id=\"chooseDir\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert btnAddPackage != null : "fx:id=\"btnAddPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
+        assert btnNewDocument != null : "fx:id=\"btnNewDocument\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert saveSpdx != null : "fx:id=\"saveSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert saveSpdxTag != null : "fx:id=\"saveSpdxTag\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert validateSpdx != null : "fx:id=\"validateSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert txtDocumentName != null : "fx:id=\"txtDocumentName\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert addedPackagesUiList != null : "fx:id=\"addedPackagesUiList\" was not injected: check your FXML file 'MainScene.fxml'.";
+
         txtDocumentName.textProperty().addListener((observable, oldValue, newValue) -> handleTxtDocumentNameChanged(newValue));
         addedPackagesUiList.setCellFactory(param -> new SpdxPackageListCell());
 
+    }
+
+    private void enableAllButtons(){
+        this.btnAddPackage.setDisable(false);
+        this.validateSpdx.setDisable(false);
+        this.chooseDir.setDisable(false);
+        this.txtDocumentName.setDisable(false);
+        this.saveSpdx.setDisable(false);
+        this.saveSpdxTag.setDisable(false);
     }
 
     private static Optional<Path> selectDirectory(Window parentWindow) {
@@ -142,6 +157,23 @@ public class MainSceneController {
 
     }
 
+    public void handleNewDocumentClicked(MouseEvent event){
+        TextInputDialog dialog = new TextInputDialog();
+        ((Stage)dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
+        dialog.setTitle("New SPDX Document");
+        dialog.setHeaderText("Enter document namespace");
+        dialog.setResult("http://url.example.com/spdx/builder");
+        Optional<String> result = dialog.showAndWait();
+        while (result.isPresent() && !SpdxLogic.validateDocumentNamespace(result.orElse(""))){
+            dialog.setContentText(result.orElse("")+ "is not a valid document namespace. Please enter a valid document namespace.");
+            result = dialog.showAndWait();
+        }
+        if (result.isPresent()){
+            SpdxDocument newDocument = SpdxLogic.createEmptyDocument(result.get());
+            loadSpdxDocument(newDocument);
+        }
+
+    }
 
     public void handleChooseDirectoryClicked(MouseEvent event) {
         Optional<Path> chosenPath = selectDirectory(chooseDir.getParent().getScene().getWindow());
@@ -155,7 +187,7 @@ public class MainSceneController {
 
 
     public void handleSaveSpdxClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("spdx", "rdf").showSaveDialog(saveSpdx.getScene().getWindow());
+        File targetFile = getSpdxFileChooser("rdf", "spdx").showSaveDialog(saveSpdx.getScene().getWindow());
         if (targetFile == null) //Dialog cancelled
             return;
         try (FileWriter writer = new FileWriter(targetFile)) {
@@ -198,10 +230,11 @@ public class MainSceneController {
         this.documentToEdit = loadedDocument;
         this.addedPackagesUiList.getItems().setAll(SpdxLogic.getSpdxPackagesInDocument(loadedDocument).collect(Collectors.toList()));
         this.txtDocumentName.setText(loadedDocument.getName());
+        enableAllButtons();
     }
 
     public void handleLoadSpdxClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("spdx", "rdf").showOpenDialog(saveSpdx.getScene().getWindow());
+        File targetFile = getSpdxFileChooser("rdf", "spdx").showOpenDialog(saveSpdx.getScene().getWindow());
         if (targetFile == null) return; //Cancelled
         try {
             SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());

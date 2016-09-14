@@ -18,14 +18,15 @@
         </AnchorPane>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="473.0" prefWidth="180.0">
             <children>
-                <Button fx:id="chooseDir" layoutX="14.0" layoutY="80.0" mnemonicParsing="false" onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..." />
-                <Button fx:id="btnAddPackage" layoutX="14.0" layoutY="130.0" mnemonicParsing="false" onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0" text="Add Package" />
-                <Button fx:id="validateSpdx" layoutX="14.0" layoutY="180.0" mnemonicParsing="false" onMouseClicked="#handleValidateSpdxClicked" prefWidth="145" text="Validate SPDX..." />
-                <Button fx:id="saveSpdx" layoutX="14.0" layoutY="230.0" mnemonicParsing="false" onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX (RDF)..." />
-                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="280.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX (RDF)..." />
-                <Button fx:id="saveSpdxTag" layoutX="14.0" layoutY="330.0" mnemonicParsing="false" onMouseClicked="#handleSaveTagClicked" prefWidth="145" text="Write SPDX (Tag)..." />
-                <Button fx:id="loadSpdxTag" layoutX="14.0" layoutY="380.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxTagClicked" prefWidth="145" text="Load SPDX (Tag)..." />
-                <TextField fx:id="txtDocumentName" layoutX="14.0" layoutY="25.0" prefHeight="26.0" prefWidth="145.0" promptText="Document name" AnchorPane.leftAnchor="14.0" />
+                <Button fx:id="chooseDir" disable="true" layoutX="14.0" layoutY="104.0" mnemonicParsing="false" onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..." />
+                <Button fx:id="btnAddPackage" disable="true" layoutX="14.0" layoutY="144.0" mnemonicParsing="false" onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0" text="Add Package" />
+                <Button fx:id="validateSpdx" disable="true" layoutX="14.0" layoutY="184.0" mnemonicParsing="false" onMouseClicked="#handleValidateSpdxClicked" prefWidth="145" text="Validate SPDX..." />
+                <Button fx:id="saveSpdx" disable="true" layoutX="14.0" layoutY="224.0" mnemonicParsing="false" onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX (RDF)..." />
+                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="264.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX (RDF)..." />
+                <Button fx:id="saveSpdxTag" disable="true" layoutX="14.0" layoutY="304.0" mnemonicParsing="false" onMouseClicked="#handleSaveTagClicked" prefWidth="145" text="Write SPDX (Tag)..." />
+                <Button fx:id="loadSpdxTag" layoutX="14.0" layoutY="344.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxTagClicked" prefWidth="145" text="Load SPDX (Tag)..." />
+                <TextField fx:id="txtDocumentName" disable="true" layoutX="14.0" layoutY="25.0" prefHeight="26.0" prefWidth="145.0" promptText="Document name" AnchorPane.leftAnchor="14.0" />
+            <Button fx:id="btnNewDocument" layoutX="14.0" layoutY="64.0" mnemonicParsing="false" onMouseClicked="#handleNewDocumentClicked" prefHeight="21.0" prefWidth="145.0" text="New Document..." />
             </children>
         </AnchorPane>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
