@@ -235,11 +235,17 @@ public class PackageEditor {
         //Package relationship types
         chcNewRelationshipType.setConverter(RELATIONSHIP_TYPE_STRING_CONVERTER);
         chcNewRelationshipType.getItems().setAll(
-                Stream.of(RelationshipType.DYNAMIC_LINK,
-                        RelationshipType.STATIC_LINK,
+                Stream.of(
+                        RelationshipType.AMENDS,
+                        RelationshipType.DESCENDANT_OF,
+                        RelationshipType.DYNAMIC_LINK,
                         RelationshipType.GENERATED_FROM,
                         RelationshipType.GENERATES,
-                        RelationshipType.OTHER)
+                        RelationshipType.HAS_PREREQUISITE,
+                        RelationshipType.PREREQUISITE_FOR,
+                        RelationshipType.STATIC_LINK,
+                        RelationshipType.OTHER
+ )
                         .collect(Collectors.toList()));
         chcNewRelationshipType.getSelectionModel().selectFirst();
         assert (otherPackages != null); //Constructor finished executing
