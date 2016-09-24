@@ -6,18 +6,17 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.ListChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.*;
 import javafx.util.StringConverter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.CheckListView;
-import org.controlsfx.control.PropertySheet;
-import org.controlsfx.property.BeanPropertyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
@@ -32,6 +31,7 @@ import spdxedit.license.FileLicenseEditor;
 import spdxedit.license.LicenseEditControl;
 import spdxedit.license.SpdxWithoutExeption;
 import spdxedit.util.StringableWrapper;
+import spdxedit.util.UiUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -79,10 +79,6 @@ public class PackageEditor {
 
     @FXML
     private TitledPane tabPackageProperties;
-
-    @FXML
-    private PropertySheet pkgPropertySheet;
-
 
     @FXML
     private TitledPane tabExternalRefs;
@@ -221,13 +217,6 @@ public class PackageEditor {
         assert btnRemoveRelationship != null : "fx:id=\"btnRemoveRelationship\" was not injected: check your FXML file 'PackageEditor.fxml'.";
 
 
-        //Package properties
-        assert pkgPropertySheet != null : "fx:id=\"pkgPropertySheet\" was not injected: check your FXML file 'PackageEditor.fxml'.";
-        pkgPropertySheet.setSearchBoxVisible(false);
-        pkgPropertySheet.setMode(PropertySheet.Mode.NAME);
-        pkgPropertySheet.setModeSwitcherVisible(false);
-
-
         //Initialize package relationship controls
         lstTargetPackages.getSelectionModel().selectedItemProperty().addListener((observable1, oldValue1, newValue1) -> handleTargetPackageSelected(newValue1));
         lstTargetPackages.setCellFactory(listView -> new MainSceneController.SpdxPackageListCell());
@@ -245,7 +234,7 @@ public class PackageEditor {
                         RelationshipType.PREREQUISITE_FOR,
                         RelationshipType.STATIC_LINK,
                         RelationshipType.OTHER
- )
+                )
                         .collect(Collectors.toList()));
         chcNewRelationshipType.getSelectionModel().selectFirst();
         assert (otherPackages != null); //Constructor finished executing
@@ -279,9 +268,12 @@ public class PackageEditor {
         filesTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         filesTable.setShowRoot(false);
 
-        Node externalRefControl = new ExternalRefListControl(pkg).getUi();
+        AnchorPane externalRefControl = new ExternalRefListControl(pkg).getUi();
+        externalRefControl.setPadding(new Insets(12, 10, 5, 10));
         tabExternalRefs.setContent(externalRefControl);
+        externalRefControl.setManaged(true);
 
+        new PackagePropertyEditor(pkg).initialize(tabPackageProperties);
 
     }
 
@@ -327,9 +319,9 @@ public class PackageEditor {
                 } catch (InvalidSPDXAnalysisException e) {
                     logger.error("Unable to get files for package " + pkg.getName(), e);
                 }
-                packageEditor.pkgPropertySheet.getItems().setAll(BeanPropertyUtils.getProperties(pkg, propertyDescriptor ->
-                        SpdxLogic.EDITABLE_PACKAGE_PROPERTIES.contains(propertyDescriptor.getName())));
+
                 packageEditor.tabFiles.setExpanded(true);
+
             });
 
             //Won't assign this event through FXML - don't want to propagate the stage beyond this point.
@@ -419,7 +411,7 @@ public class PackageEditor {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Add file");
         File file = chooser.showOpenDialog(btnAddFile.getParent().getScene().getWindow());
-        if (file==null) //Dialog cancelled.
+        if (file == null) //Dialog cancelled.
             return;
         Path path = Paths.get(file.getAbsolutePath());
         SpdxLogic.addFileToPackage(pkg, path, file.toURI().toString());
@@ -476,21 +468,21 @@ public class PackageEditor {
         }
     }
 
-    public void handleBtnCopyrightClick(MouseEvent event){
+    public void handleBtnCopyrightClick(MouseEvent event) {
         String oldCopyright = currentFile.getCopyrightText();
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Copyright");
         dialog.setHeaderText("Enter the copyright text");
-        ((Stage)dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
+        ((Stage) dialog.getDialogPane().getScene().getWindow()).getIcons().addAll(UiUtils.ICON_IMAGE_VIEW.getImage());
         Optional<String> newCopyrightText = dialog.showAndWait();
-        if (newCopyrightText.isPresent()){
+        if (newCopyrightText.isPresent()) {
             currentFile.setCopyrightText(newCopyrightText.get());
         }
 
     }
 
 
-    public void handleBtnFileLicenseClick(MouseEvent event){
+    public void handleBtnFileLicenseClick(MouseEvent event) {
         FileLicenseEditor.editConcludedLicense(this.currentFile, documentContainer);
     }
 }

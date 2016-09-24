@@ -1,12 +1,8 @@
 package spdxedit;
 
-import antlr.RecognitionException;
-import antlr.TokenStreamException;
 import com.google.common.base.Joiner;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -24,7 +20,7 @@ import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxPackage;
 import org.spdx.tag.CommonCode;
 import org.spdx.tools.TagToRDF;
-import spdxedit.license.FileLicenseEditor;
+import spdxedit.util.UiUtils;
 
 import java.io.*;
 import java.nio.file.Files;

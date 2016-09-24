@@ -6,11 +6,11 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="666.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="421.0" prefWidth="666.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
 
     <children>
           <ListView fx:id="lstExternalRefs" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="360.0" prefWidth="666.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-          <ButtonBar maxWidth="1.7976931348623157E308" prefHeight="40.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="410.0">
+          <ButtonBar layoutY="354.0" maxWidth="1.7976931348623157E308" prefHeight="46.0" prefWidth="666.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
               <buttons>
                   <Button fx:id="btnAdd" minWidth="65.0" mnemonicParsing="false" prefHeight="25.0" text="Add..." />
                   <Button fx:id="btnRemove" mnemonicParsing="false" text="Remove" />

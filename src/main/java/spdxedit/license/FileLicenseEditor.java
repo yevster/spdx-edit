@@ -4,9 +4,7 @@ package spdxedit.license;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
-import javafx.scene.control.DialogPane;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import org.apache.commons.lang3.StringUtils;
 import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxDocumentContainer;
@@ -15,7 +13,7 @@ import org.spdx.rdfparser.license.ExtractedLicenseInfo;
 import org.spdx.rdfparser.model.SpdxFile;
 import spdxedit.Main;
 import spdxedit.SpdxLogic;
-import spdxedit.UiUtils;
+import spdxedit.util.UiUtils;
 
 import java.util.Arrays;
 import java.util.Optional;

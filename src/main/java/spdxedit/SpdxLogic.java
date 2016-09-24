@@ -346,11 +346,6 @@ public class SpdxLogic {
 		}
 	}
 
-	// Properties of a package that can be edited on the properties tab.
-	// TODO: Create editors, pretty names, etc.
-	static final Set<String> EDITABLE_PACKAGE_PROPERTIES = ImmutableSet.of("description", "copyrightText",
-			"downloadLocation", "packageFileName", "homepage", "originator", "packageFileName", "summary", "supplier",
-			"versionInfo", "comment", "sourceInfo");
 
 	/**
 	 * Utility method to make verification code use in stream processing not

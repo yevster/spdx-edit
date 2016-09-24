@@ -7,13 +7,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spdx.rdfparser.SpdxDocumentContainer;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.license.LicenseEditControl;
+import spdxedit.util.UiUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;

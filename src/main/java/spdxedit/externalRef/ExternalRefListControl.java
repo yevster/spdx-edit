@@ -47,6 +47,7 @@ public class ExternalRefListControl {
             txtRefType.setMinWidth(300);
             txtRefType.setMaxWidth(300);
             txtLocator.setMaxWidth(Double.MAX_VALUE);
+            txtLocator.setMinWidth(340);
 
             txtRefType.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
@@ -143,7 +144,7 @@ public class ExternalRefListControl {
         }
     }
 
-    public Node getUi() {
+    public AnchorPane getUi() {
         try {
             FXMLLoader loader = new FXMLLoader(ExternalRefListControl.class.getResource("/ExternalRefList.fxml"));
             loader.setController(this);
