@@ -1,5 +1,5 @@
 # spdx-edit
-SpdxEdit is a simple SPDX 2.0 editor/builder, which can be used to edit existing SPDX 2.0 files or to generate new ones. 
+SpdxEdit is a simple SPDX 2.1 editor/builder, which can be used to edit existing SPDX 2.1 files or to generate new ones. 
 
 SpdxEdit uses [Spdx Tools](https://github.com/spdx/tools) to read, edit, and write RDF-formatted SPDX files. To build, first clone the SpdxTools repository and run ```mvn make install```. Then, you can clone this repository and run ```mvn clean package```.
 
