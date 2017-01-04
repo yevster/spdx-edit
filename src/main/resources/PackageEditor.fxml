@@ -45,12 +45,12 @@
                </AnchorPane>
            </content>
          </TitledPane>
-            <TitledPane fx:id="tabRelationships" animated="false" expanded="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationshpis">
+            <TitledPane fx:id="tabRelationships" animated="false" expanded="false" layoutX="10.0" layoutY="10.0" prefHeight="414.0" prefWidth="709.0" text="Relationships">
                 <content>
                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                   <children>
                      <ListView fx:id="lstTargetPackages" layoutX="17.0" layoutY="35.0" prefHeight="361.0" prefWidth="327.0" />
-                     <Label layoutX="17.0" layoutY="14.0" text="Target pagackage" />
+                     <Label layoutX="17.0" layoutY="14.0" text="Target package" />
                      <ListView fx:id="lstPackageRelationships" layoutX="351.0" layoutY="35.0" prefHeight="195.0" prefWidth="280.0" />
                      <Label layoutX="351.0" layoutY="14.0" text="Relationships" />
                      <ChoiceBox fx:id="chcNewRelationshipType" layoutX="351.0" layoutY="239.0" prefHeight="31.0" prefWidth="147.0" />

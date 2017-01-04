@@ -448,7 +448,7 @@ public class PackageEditor {
     }
 
     private void handleTargetPackageSelected(SpdxPackage pkg) {
-        //Get the relationshpis the edited package has to the selected target package.
+        //Get the relationships the edited package has to the selected target package.
         List<StringableWrapper<RelationshipType>> relationshipTypes = Arrays.stream(this.pkg.getRelationships())
                 .filter(relationship -> Objects.equals(relationship.getRelatedSpdxElement(), pkg))
                 .map(Relationship::getRelationshipType)
