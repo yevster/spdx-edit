@@ -20,6 +20,7 @@ import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxPackage;
 import org.spdx.tag.CommonCode;
 import org.spdx.tools.TagToRDF;
+import spdxedit.io.FileDataType;
 import spdxedit.util.UiUtils;
 
 import java.io.*;
@@ -45,9 +46,6 @@ public class MainSceneController {
 
     @FXML
     private Button saveSpdx;
-
-    @FXML
-    private Button saveSpdxTag;
 
     @FXML
     private Button validateSpdx;
@@ -86,16 +84,20 @@ public class MainSceneController {
     }
 
 
-    private FileChooser getSpdxFileChooser(String... extensions) {
+    private FileChooser getSpdxFileChooser(Iterable<String> extenions) {
         FileChooser chooser = new FileChooser();
 
-        for (int i = 0; i < extensions.length; ++i) {
-            FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter(extensions[i], "*." + extensions[i]);
+        boolean first = true;
+        for (String extension : extenions) {
+            FileChooser.ExtensionFilter spdxExtensionFilter = new FileChooser.ExtensionFilter(extension, "*." + extension);
             chooser.getExtensionFilters().add(spdxExtensionFilter);
-            if (i == 0) {
+            if (first){
                 chooser.setSelectedExtensionFilter(spdxExtensionFilter);
+                first = false;
             }
+
         }
+
         return chooser;
     }
 
@@ -106,7 +108,6 @@ public class MainSceneController {
         assert btnAddPackage != null : "fx:id=\"btnAddPackage\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert btnNewDocument != null : "fx:id=\"btnNewDocument\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert saveSpdx != null : "fx:id=\"saveSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
-        assert saveSpdxTag != null : "fx:id=\"saveSpdxTag\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert validateSpdx != null : "fx:id=\"validateSpdx\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert txtDocumentName != null : "fx:id=\"txtDocumentName\" was not injected: check your FXML file 'MainScene.fxml'.";
         assert addedPackagesUiList != null : "fx:id=\"addedPackagesUiList\" was not injected: check your FXML file 'MainScene.fxml'.";
@@ -122,7 +123,6 @@ public class MainSceneController {
         this.chooseDir.setDisable(false);
         this.txtDocumentName.setDisable(false);
         this.saveSpdx.setDisable(false);
-        this.saveSpdxTag.setDisable(false);
     }
 
     private static Optional<Path> selectDirectory(Window parentWindow) {
@@ -183,31 +183,19 @@ public class MainSceneController {
     }
 
 
+
     public void handleSaveSpdxClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("rdf", "spdx").showSaveDialog(saveSpdx.getScene().getWindow());
+        Optional<FileDataType> outputType = IoFileTypeSelectionDialog.getDataType("Save SPDX");
+        if (!outputType.isPresent()) return;
+
+        File targetFile = getSpdxFileChooser( outputType.get().getExtensions()).showSaveDialog(saveSpdx.getScene().getWindow());
         if (targetFile == null) //Dialog cancelled
             return;
-        try (FileWriter writer = new FileWriter(targetFile)) {
-            this.documentToEdit.getDocumentContainer().getModel().write(writer);
+        try {
+            outputType.get().writeToFile(targetFile, documentToEdit);
         } catch (IOException e) {
             logger.error("Unable to write SPDX file", e);
         }
-    }
-
-    public void handleSaveTagClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("spdx", "tag").showSaveDialog(saveSpdx.getScene().getWindow());
-        if (targetFile == null) //Dialog cancelled
-            return;
-        try (PrintWriter out = new PrintWriter(targetFile)) {
-// read the tag-value constants from a file
-            Properties constants = CommonCode
-                    .getTextFromProperties("org/spdx/tag/SpdxTagValueConstants.properties");
-            // print document to a file using tag-value format
-            CommonCode.printDoc(documentToEdit, out, constants);
-        } catch (IOException | InvalidSPDXAnalysisException e) {
-            new Alert(Alert.AlertType.ERROR, "Unable to write tag file: " + e.getMessage(), ButtonType.OK);
-        }
-
     }
 
     public void handleAddPackageClicked(MouseEvent event) {
@@ -231,10 +219,13 @@ public class MainSceneController {
     }
 
     public void handleLoadSpdxClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("rdf", "spdx").showOpenDialog(saveSpdx.getScene().getWindow());
+        Optional<FileDataType> inputType = IoFileTypeSelectionDialog.getDataType("Load SPDX");
+        if (!inputType.isPresent())return;
+
+        File targetFile = getSpdxFileChooser(inputType.get().getExtensions()).showOpenDialog(saveSpdx.getScene().getWindow());
         if (targetFile == null) return; //Cancelled
         try {
-            SpdxDocument loadedDocument = SPDXDocumentFactory.createSpdxDocument(targetFile.getPath());
+            SpdxDocument loadedDocument = inputType.get().readFromFile(targetFile);
             loadSpdxDocument(loadedDocument);
         } catch (InvalidSPDXAnalysisException isae) {
             logger.error("Invalid SPDX load attempt", isae);
@@ -248,24 +239,7 @@ public class MainSceneController {
         }
     }
 
-    public void handleLoadSpdxTagClicked(MouseEvent event) {
-        File targetFile = getSpdxFileChooser("spdx", "tag").showOpenDialog(saveSpdx.getScene().getWindow());
-        try (FileInputStream in = new FileInputStream(targetFile)) {
-            List<String> warnings = new LinkedList<>();
-            SpdxDocumentContainer container = TagToRDF.convertTagFileToRdf(in, "RDF/XML", warnings);
-            if (warnings.size() > 0) {
-                Alert warningsAlert = new Alert(Alert.AlertType.WARNING, "Warnings occured in parsing Tag document", ButtonType.OK);
-                TextArea warningList = new TextArea();
-                warningList.setText(Joiner.on("\n").join(warnings));
-                warningsAlert.getDialogPane().setExpandableContent(warningList);
-                warningsAlert.showAndWait();
-            }
-            loadSpdxDocument(container.getSpdxDocument());
-        } catch (Exception e) {
-            new Alert(Alert.AlertType.ERROR, "Error loading SPDX file " + targetFile.getAbsolutePath()).showAndWait();
-        }
 
-    }
 
     public void handlePackageListClicked(MouseEvent event) {
         if (event.getClickCount() == 2) {

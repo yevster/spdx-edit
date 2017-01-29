@@ -21,10 +21,8 @@
                 <Button fx:id="chooseDir" disable="true" layoutX="14.0" layoutY="104.0" mnemonicParsing="false" onMouseClicked="#handleChooseDirectoryClicked" prefWidth="145" text="Choose Directory..." />
                 <Button fx:id="btnAddPackage" disable="true" layoutX="14.0" layoutY="144.0" mnemonicParsing="false" onMouseClicked="#handleAddPackageClicked" prefHeight="21.0" prefWidth="145.0" text="Add Package" />
                 <Button fx:id="validateSpdx" disable="true" layoutX="14.0" layoutY="184.0" mnemonicParsing="false" onMouseClicked="#handleValidateSpdxClicked" prefWidth="145" text="Validate SPDX..." />
-                <Button fx:id="saveSpdx" disable="true" layoutX="14.0" layoutY="224.0" mnemonicParsing="false" onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX (RDF)..." />
-                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="264.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX (RDF)..." />
-                <Button fx:id="saveSpdxTag" disable="true" layoutX="14.0" layoutY="304.0" mnemonicParsing="false" onMouseClicked="#handleSaveTagClicked" prefWidth="145" text="Write SPDX (Tag)..." />
-                <Button fx:id="loadSpdxTag" layoutX="14.0" layoutY="344.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxTagClicked" prefWidth="145" text="Load SPDX (Tag)..." />
+                <Button fx:id="saveSpdx" disable="true" layoutX="14.0" layoutY="224.0" mnemonicParsing="false" onMouseClicked="#handleSaveSpdxClicked" prefWidth="145" text="Write SPDX..." />
+                <Button fx:id="loadSpdx" layoutX="14.0" layoutY="264.0" mnemonicParsing="false" onMouseClicked="#handleLoadSpdxClicked" prefWidth="145" text="Load SPDX..." />
                 <TextField fx:id="txtDocumentName" disable="true" layoutX="14.0" layoutY="25.0" prefHeight="26.0" prefWidth="145.0" promptText="Document name" AnchorPane.leftAnchor="14.0" />
             <Button fx:id="btnNewDocument" layoutX="14.0" layoutY="64.0" mnemonicParsing="false" onMouseClicked="#handleNewDocumentClicked" prefHeight="21.0" prefWidth="145.0" text="New Document..." />
             </children>
