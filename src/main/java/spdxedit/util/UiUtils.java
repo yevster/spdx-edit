@@ -14,6 +14,7 @@ import spdxedit.MainSceneController;
  */
 public class UiUtils {
     public static final ImageView ICON_IMAGE_VIEW = new ImageView(MainSceneController.class.getResource("/img/document-8x.png").toString());
+    public static final ImageView ICON_IMAGE_VIEW_SMALL = new ImageView(MainSceneController.class.getResource("/img/document-2x.png").toString());
 
     /**
      * Get a modal dialog with the application icon

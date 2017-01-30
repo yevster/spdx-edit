@@ -16,7 +16,9 @@ import java.util.function.Function;
 public enum FileDataType {
     RDF_XML("RDF/XML", FileIoLogic::writeRdfXml, FileIoLogic::loadRdfXml, "rdf", "spdx"),
     TAG("Tag:Value", FileIoLogic::writeTagValue, FileIoLogic::loadTagValue, "spdx"),
-  /* TURTLE("RDF-Turtle", "turtle"),
+    TURTLE("RDF-Turtle", FileIoLogic::writeTurtle, FileIoLogic::readTurtle, "turtle", "spdx"),
+    JSON_LD("JSON-LD", FileIoLogic::writeJsonLd, FileIoLogic::readJsonLd, "json");
+    /*
     JSONLD("JSON-LD", "json"),
     RDF_JSON("RDF/JSON", "json")*/;
 
@@ -32,17 +34,19 @@ public enum FileDataType {
         this.fileOutputLogic = fileOutputLogic;
     }
 
-    public List<String> getExtensions(){return extensions;}
+    public List<String> getExtensions() {
+        return extensions;
+    }
 
     public String getDisplayName() {
         return displayName;
     }
 
-    public void writeToFile(File file, SpdxDocument document) throws IOException{
+    public void writeToFile(File file, SpdxDocument document) throws IOException {
         fileOutputLogic.write(file, document);
     }
 
-    public SpdxDocument readFromFile(File file) throws IOException, InvalidSPDXAnalysisException{
+    public SpdxDocument readFromFile(File file) throws IOException, InvalidSPDXAnalysisException {
         return fileInputLogic.read(file);
     }
 
