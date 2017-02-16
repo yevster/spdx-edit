@@ -6,6 +6,7 @@ import org.spdx.rdfparser.InvalidSPDXAnalysisException;
 import org.spdx.rdfparser.SpdxPackageVerificationCode;
 import org.spdx.rdfparser.license.AnyLicenseInfo;
 import org.spdx.rdfparser.license.ListedLicenses;
+import org.spdx.rdfparser.model.SpdxDocument;
 import org.spdx.rdfparser.model.SpdxFile;
 import org.spdx.rdfparser.model.SpdxPackage;
 import spdxedit.SpdxLogic;
@@ -45,7 +46,9 @@ public class PackageVerificationCodeTest {
     @Test
     public void twoFilePackageTest() throws URISyntaxException, InvalidSPDXAnalysisException {
         Path directoryPath = Paths.get(this.getClass().getClassLoader().getResource("hashTestFiles").toURI());
-        SpdxPackage pkg = SpdxLogic.createSpdxPackageForPath(Optional.of(directoryPath), ListedLicenses.getListedLicenses().getListedLicenseById("GPL-2.0"), "FOO", "NO COMMENT", true);
+        SpdxDocument doc = SpdxLogic.createEmptyDocument("http://example.org");
+
+        SpdxPackage pkg = SpdxLogic.createSpdxPackageForPath(Optional.of(directoryPath), doc, ListedLicenses.getListedLicenses().getListedLicenseById("GPL-2.0"), "FOO", "NO COMMENT", true);
         String actualVerificationCode = SpdxLogic.computePackageVerificationCode(pkg);
         final String expectedVerificationCode = "36b3d9fdaae5c74d3bc5528c28695236cc54dfd2";
         Assert.assertEquals(expectedVerificationCode, actualVerificationCode);

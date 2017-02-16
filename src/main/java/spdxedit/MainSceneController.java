@@ -203,7 +203,6 @@ public class MainSceneController {
         assert (selectedNodes.size() <= 1);
         Optional<Path> path = selectedNodes.size() > 0 ? Optional.of(selectedNodes.get(0).getValue()) : Optional.empty();
         SpdxPackage newPackage = NewPackageDialog.createPackageWithPrompt(btnAddPackage.getScene().getWindow(), path, documentToEdit.getDocumentContainer());
-        SpdxLogic.addPackageToDocument(this.documentToEdit, newPackage);
         addedPackagesUiList.getItems().add(newPackage);
         if (addedPackagesUiList.getSelectionModel().getSelectedItem() == null) {
             addedPackagesUiList.getSelectionModel().selectFirst();

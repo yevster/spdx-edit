@@ -112,7 +112,7 @@ public class NewPackageDialog {
 
     private SpdxPackage createSpdxPackageFromInputs() {
         Optional<Path> pathForPackage = chkRemotePackage.isSelected() ? Optional.empty() : Optional.of(this.path);
-        return SpdxLogic.createSpdxPackageForPath(pathForPackage, declaredLicenseEdit.getValue(), name.getText(), downloadLocation.getText(), chkOmitHiddenFiles.isSelected());
+        return SpdxLogic.createSpdxPackageForPath(pathForPackage, this.documentContainer.getSpdxDocument(), declaredLicenseEdit.getValue(), name.getText(), downloadLocation.getText(), chkOmitHiddenFiles.isSelected());
     }
 
 

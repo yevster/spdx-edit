@@ -14,10 +14,11 @@ import java.util.function.Function;
  * Created by ybronshteyn on 1/29/17.
  */
 public enum FileDataType {
-    RDF_XML("RDF/XML", FileIoLogic::writeRdfXml, FileIoLogic::loadRdfXml, "rdf", "spdx"),
+    RDF_XML("RDF-XML", FileIoLogic::writeRdfXml, FileIoLogic::loadRdfXml, "rdf", "spdx"),
     TAG("Tag:Value", FileIoLogic::writeTagValue, FileIoLogic::loadTagValue, "spdx"),
-    TURTLE("RDF-Turtle", FileIoLogic::writeTurtle, FileIoLogic::readTurtle, "turtle", "spdx"),
-    JSON_LD("JSON-LD", FileIoLogic::writeJsonLd, FileIoLogic::readJsonLd, "json");
+    TURTLE("RDF-Turtle", FileIoLogic::writeTurtle, FileIoLogic::readTurtle, "ttl", "turtle", "spdx"),
+    JSON_LD("JSON-LD", FileIoLogic::writeJsonLd, FileIoLogic::readJsonLd, "json"),
+    RDF_JSON("RDF-JSON", FileIoLogic::writeRdfJson, FileIoLogic::readRdfJson, "json");
     /*
     JSONLD("JSON-LD", "json"),
     RDF_JSON("RDF/JSON", "json")*/;

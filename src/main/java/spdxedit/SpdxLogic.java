@@ -40,6 +40,8 @@ public class SpdxLogic {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpdxLogic.class);
 	private static final String SPDX_SPEC_VERSION="SPDX-2.1";
+	public static final String SPDX_URI_NAMESPACE="http://spdx.org/rdf/terms#";
+	public static final String RDFS_URI_NAMESPACE="http://www.w3.org/2000/01/rdf-schema#";
 
 	public static SpdxDocument createEmptyDocument(String uri) {
 
@@ -111,7 +113,7 @@ public class SpdxLogic {
 	 * @param downloadLocation
 	 * @return
 	 */
-	public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, AnyLicenseInfo declaredLicense,
+	public static SpdxPackage createSpdxPackageForPath(Optional<Path> pkgRootPath, SpdxDocument containingDocument, AnyLicenseInfo declaredLicense,
 			String name, String downloadLocation, final boolean omitHiddenFiles) {
 		Objects.requireNonNull(pkgRootPath);
 		try {
@@ -125,6 +127,7 @@ public class SpdxLogic {
 
 			if (pkgRootPath.isPresent()) {
 				// Add files in path
+
 				List<SpdxFile> addedFiles = new LinkedList<>();
 				String baseUri = pkgRootPath.get().toUri().toString();
 				FileVisitor<Path> fileVisitor = new FileVisitor<Path>() {
@@ -164,7 +167,10 @@ public class SpdxLogic {
 				Files.walkFileTree(pkgRootPath.get(), fileVisitor);
 				SpdxFile[] files = addedFiles.stream().toArray(size -> new SpdxFile[size]);
 				pkg.setFiles(files);
+				String prefix = StringUtils.removeAll(pkgRootPath.get().getFileName().toString(), " ");
+				containingDocument.getDocumentContainer().getModel().getNsPrefixMap().put(prefix, baseUri);
 				recomputeVerificationCode(pkg);
+				addPackageToDocument(containingDocument, pkg);
 			} else {
 				//External package
 				pkg.setFilesAnalyzed(false);
