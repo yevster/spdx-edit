@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 
 group = 'groupId'
-version = '1.0.2'
+version = '1.2.0'
 
 description = """SPDX Editor"""
 
