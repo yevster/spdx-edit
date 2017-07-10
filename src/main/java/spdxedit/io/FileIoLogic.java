@@ -13,6 +13,7 @@ import org.apache.jena.riot.RDFFormat;
 import org.apache.jena.riot.system.PrefixMap;
 import org.apache.jena.riot.system.PrefixMapFactory;
 import org.apache.jena.riot.writer.JsonLDWriter;
+import org.apache.jena.riot.writer.NTriplesWriter;
 import org.apache.jena.riot.writer.RDFJSONWriter;
 import org.apache.jena.riot.writer.TurtleWriter;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
@@ -93,10 +94,32 @@ public class FileIoLogic {
         }
     }
 
+    public static void writeNtripples(File file, SpdxDocument document) throws IOException {
+        try (FileWriter writer = new FileWriter(file)) {
+            NTriplesWriter nTriplesWriter = new NTriplesWriter();
+            Model model = document.getDocumentContainer().getModel();
+            PrefixMap prefixMap = PrefixMapFactory.create(model.getNsPrefixMap());
+            prefixMap.add("", SpdxLogic.SPDX_URI_NAMESPACE);
+            prefixMap.add("licenseList", ListedLicenses.LISTED_LICENSE_URI_PREFIX);
+            prefixMap.add(StringUtils.removeAll(document.getName(), " "), document.getDocumentNamespace());
+            nTriplesWriter.write(writer, model.getGraph(), prefixMap, SpdxLogic.SPDX_URI_NAMESPACE, null);
+        } catch (InvalidSPDXAnalysisException e) {
+            throw new RuntimeException("Document information (name and namespace) not present.");
+        }
+    }
+
     public static SpdxDocument readTurtle(File file) throws IOException, InvalidSPDXAnalysisException {
+        return readWithJenaReader("TURTLE", file);
+    }
+
+    public static SpdxDocument readNTripples(File file) throws IOException, InvalidSPDXAnalysisException{
+        return readWithJenaReader("NTRIPLES", file);
+    }
+
+    private static SpdxDocument readWithJenaReader(String jenaLanguage, File file) throws IOException, InvalidSPDXAnalysisException {
         try (FileReader reader = new FileReader(file)) {
             Model model = ModelFactory.createDefaultModel();
-            model.getReader("TURTLE").read(model, reader, getBaseUrl(file));
+            model.getReader(jenaLanguage).read(model, reader, getBaseUrl(file));
             SpdxDocumentContainer container = new SpdxDocumentContainer(model);
             return container.getSpdxDocument();
         }
@@ -118,13 +141,7 @@ public class FileIoLogic {
     }
 
     public static SpdxDocument readJsonLd(File file) throws IOException, InvalidSPDXAnalysisException {
-        try (FileReader reader = new FileReader(file)) {
-            Model model = ModelFactory.createDefaultModel();
-            model.getReader(JSON_LD_FORMAT.getLang().getName()).read(model, reader, getBaseUrl(file));
-            SpdxDocumentContainer container = new SpdxDocumentContainer(model);
-            return container.getSpdxDocument();
-
-        }
+        return readWithJenaReader(JSON_LD_FORMAT.getLang().getName(), file);
     }
 
 

@@ -18,7 +18,9 @@ public enum FileDataType {
     TAG("Tag:Value", FileIoLogic::writeTagValue, FileIoLogic::loadTagValue, "spdx"),
     TURTLE("RDF-Turtle", FileIoLogic::writeTurtle, FileIoLogic::readTurtle, "ttl", "turtle", "spdx"),
     JSON_LD("JSON-LD", FileIoLogic::writeJsonLd, FileIoLogic::readJsonLd, "json"),
-    RDF_JSON("RDF-JSON", FileIoLogic::writeRdfJson, FileIoLogic::readRdfJson, "json");
+    RDF_JSON("RDF-JSON", FileIoLogic::writeRdfJson, FileIoLogic::readRdfJson, "json"),
+    N_TRIPLES("N-TRIPLES", FileIoLogic::writeNtripples, FileIoLogic::readNTripples, "ntripples");
+
     /*
     JSONLD("JSON-LD", "json"),
     RDF_JSON("RDF/JSON", "json")*/;
