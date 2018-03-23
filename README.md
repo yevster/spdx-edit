@@ -12,6 +12,6 @@ SpdxEdit requires [Java 8](http://www.oracle.com/technetwork/java/javase/downloa
 
 SpdxEdit is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0).
 
-###Known limitations:
+### Known limitations:
 Only one extracted license per file is supported (SPDX spec supports unlimited).
 Standard licenses found in files not presently supported
