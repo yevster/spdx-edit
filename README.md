@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/yevster/spdx-edit.svg?branch=master)](https://travis-ci.org/yevster/spdx-edit)
 [![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/yevster/spdx-edit/branches/master/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/yevster/spdx-edit/branches/master)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://spdx.org/licenses/Apache-2.0)
 
 SpdxEdit is a simple SPDX 2.1 editor/builder, which can be used to edit existing SPDX 2.1 files or to generate new ones. 
 

@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'application'
+apply from: "dependencies.gradle"
 
 group = 'groupId'
 version = '1.2.1'
@@ -14,15 +15,37 @@ tasks.withType(JavaCompile) {
 
 mainClassName = "spdxedit.Main"
 
+configurations.all {
+  resolutionStrategy {  
+    eachDependency { DependencyResolveDetails details ->
+      if (details.requested.group == 'org.apache.poi') {
+        details.useVersion versions.poi
+      }    
+      else if (details.requested.group == 'com.fasterxml.jackson.core') {
+        details.useVersion versions.jackson
+      }        
+    }
+  }
+}
+
+
+
 repositories {
         
      maven { url "https://repository.apache.org/content/repositories/releases" }
      maven { url "https://dl.bintray.com/yevster/maven" }
      maven { url "http://repo.maven.apache.org/maven2" }
+     maven { url 'https://maven.repository.redhat.com/ga/'}
 }
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.25'
     compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.25'
+    compile (group: 'xerces', name: 'xercesImpl', version:versions.xerces){
+        force=true
+    }
+    compile (group: org.apache.thrift, name: 'libthrift', version: '0.11.0'){
+        force=true
+    }
     compile group: 'org.spdx', name: 'spdx-tools', version:'2.1.11'
     compile group: 'org.antlr', name: 'antlr', version:'3.4'
     compile group: 'org.controlsfx', name: 'controlsfx', version:'8.40.14'
