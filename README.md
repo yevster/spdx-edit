@@ -1,4 +1,8 @@
 # spdx-edit
+
+[![Build Status](https://travis-ci.org/yevster/spdx-edit.svg?branch=master)](https://travis-ci.org/yevster/spdx-edit)
+[![Black Duck Security Risk](https://copilot.blackducksoftware.com/github/repos/yevster/spdx-edit/branches/master/badge-risk.svg)](https://copilot.blackducksoftware.com/github/repos/yevster/spdx-edit/branches/master)
+
 SpdxEdit is a simple SPDX 2.1 editor/builder, which can be used to edit existing SPDX 2.1 files or to generate new ones. 
 
 SpdxEdit uses [Spdx Tools](https://github.com/spdx/tools) to read, edit, and write RDF-formatted SPDX files. To run, extract the zip file, navigate to the `bin` directory, and run `spdx-edit` (on Mac or *nix) or `spdx-edit.bat` (on Windows). To build the application yourself, you can clone this repository and run ```./gradlew assemble```.
