@@ -43,7 +43,7 @@ dependencies {
     compile (group: 'xerces', name: 'xercesImpl', version:versions.xerces){
         force=true
     }
-    compile (group: 'org.apache.thrift', name: 'libthrift', version: '0.11.0'){
+    compile (group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0'){
         force=true
     }
     compile group: 'org.spdx', name: 'spdx-tools', version:'2.1.11'
