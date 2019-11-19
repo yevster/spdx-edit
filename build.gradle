@@ -46,7 +46,7 @@ dependencies {
     compile (group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0'){
         force=true
     }
-    compile group: 'org.spdx', name: 'spdx-tools', version:'2.1.11'
+    compile group: 'org.spdx', name: 'spdx-tools', version:'2.1.20'
     compile group: 'org.antlr', name: 'antlr', version:'3.5.2'
     compile group: 'org.controlsfx', name: 'controlsfx', version:'8.40.14'
     compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
