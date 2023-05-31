@@ -1,3 +1,6 @@
+plugins {
+  id 'org.openjfx.javafxplugin' version '0.0.13'
+}
 apply plugin: 'java'
 apply plugin: 'application'
 apply from: "dependencies.gradle"
@@ -29,6 +32,10 @@ configurations.all {
 }
 
 
+javafx {
+    version = "18"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
 
 repositories {
         
