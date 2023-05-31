@@ -34,7 +34,7 @@ repositories {
         
      maven { url "https://repository.apache.org/content/repositories/releases" }
      maven { url "https://dl.bintray.com/yevster/maven" }
-     maven { url "http://repo.maven.apache.org/maven2" }
+     maven { url "https://repo.maven.apache.org/maven2" }
      maven { url 'https://maven.repository.redhat.com/ga/'}
 }
 dependencies {
