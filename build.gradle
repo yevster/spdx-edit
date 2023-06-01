@@ -1,56 +1,67 @@
-apply plugin: 'java'
-apply plugin: 'application'
-apply from: "dependencies.gradle"
+plugins {
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'java'
+    id 'application'
+    id 'org.beryx.jlink' version '2.26.0'
+}
 
+ext {
+    versions = [
+        poi: '3.17',
+        xerces: '2.12.0',
+        jackson: '2.9.8'
+    ]
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
 group = 'groupId'
 version = '1.2.2'
-
+mainClassName = "spdxedit.Main"
 description = """SPDX Editor"""
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
-mainClassName = "spdxedit.Main"
-
-configurations.all {
-  resolutionStrategy {  
-    eachDependency { DependencyResolveDetails details ->
-      if (details.requested.group == 'org.apache.poi') {
-        details.useVersion versions.poi
-      }    
-      else if (details.requested.group == 'com.fasterxml.jackson.core') {
-        details.useVersion versions.jackson
-      }        
+javafx {
+    version = '17'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+jar {
+    manifest {
+        attributes 'Main-Class': 'spdxedit.Launcher'
     }
-  }
+//     from {
+//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//     }
 }
-
-
-
+jlink {
+   launcher {
+       name = 'spdx-edit'
+   }
+}
 repositories {
-        
-     maven { url "https://repository.apache.org/content/repositories/releases" }
-     maven { url "https://dl.bintray.com/yevster/maven" }
-     maven { url "http://repo.maven.apache.org/maven2" }
-     maven { url 'https://maven.repository.redhat.com/ga/'}
+    mavenCentral()
 }
+
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.29'
-    compile group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.29'
-    compile (group: 'xerces', name: 'xercesImpl', version:versions.xerces){
-        force=true
-    }
-    compile (group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0'){
-        force=true
-    }
-    compile group: 'org.spdx', name: 'spdx-tools', version:'2.1.20'
-    compile group: 'org.antlr', name: 'antlr', version:'3.4'
-    compile group: 'org.controlsfx', name: 'controlsfx', version:'8.40.15'
-    compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
-    compile group: 'com.google.guava', name: 'guava', version:'16.0.1'
-    compile group: 'org.apache.jena', name: 'apache-jena-libs', version:'3.13.1'
-    testCompile group: 'junit', name: 'junit', version:'4.12'
+    implementation "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
+    implementation group: 'com.google.guava', name: 'guava', version: '29.0-jre'
+    implementation group: 'org.antlr', name: 'antlr', version: '3.4'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.13.1'
+    implementation group: 'org.apache.poi', name: 'poi', version: versions.poi
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: versions.poi
+    implementation group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: versions.poi
+    implementation group: 'org.apache.thrift', name: 'libthrift', version: '0.18.1'
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.2'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    implementation group: 'org.spdx', name: 'spdx-tools', version: '2.2.8'
+    implementation group: 'xerces', name: 'xercesImpl', version: versions.xerces
+    runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
+    runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
+    // runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }

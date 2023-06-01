@@ -1,7 +1,0 @@
-ext {
-    versions = [
-        poi: '3.17',
-        xerces: '2.12.0',
-        jackson: '2.9.8'
-    ]
-}
