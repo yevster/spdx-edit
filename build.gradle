@@ -1,5 +1,5 @@
 plugins {
-  id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 apply plugin: 'java'
 apply plugin: 'application'
@@ -13,51 +13,46 @@ description = """SPDX Editor"""
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
-	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 }
 
 mainClassName = "spdxedit.Main"
 
 configurations.all {
-  resolutionStrategy {
-    eachDependency { DependencyResolveDetails details ->
-      if (details.requested.group == 'org.apache.poi') {
-        details.useVersion versions.poi
-      }
-      else if (details.requested.group == 'com.fasterxml.jackson.core') {
-        details.useVersion versions.jackson
-      }
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            if (details.requested.group == 'org.apache.poi') {
+                details.useVersion versions.poi
+            } else if (details.requested.group == 'com.fasterxml.jackson.core') {
+                details.useVersion versions.jackson
+            }
+        }
     }
-  }
 }
 
 
 javafx {
     version = '11'
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base' ]
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
 }
 
 repositories {
     mavenCentral()
-    maven { url "https://repository.apache.org/content/repositories/releases" }
-    maven { url "https://dl.bintray.com/yevster/maven" }
-    maven { url "https://repo.maven.apache.org/maven2" }
-    maven { url 'https://maven.repository.redhat.com/ga/'}
 }
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version:'1.7.29'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version:'1.7.29'
-    implementation (group: 'xerces', name: 'xercesImpl', version:versions.xerces){
-        force=true
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.29'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.29'
+    implementation(group: 'xerces', name: 'xercesImpl', version: versions.xerces) {
+        force = true
     }
-    implementation (group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0'){
-        force=true
+    implementation(group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0') {
+        force = true
     }
-    implementation group: 'org.spdx', name: 'spdx-tools', version:'2.1.20'
-    implementation group: 'org.antlr', name: 'antlr', version:'3.4'
-    implementation group: 'org.controlsfx', name: 'controlsfx', version:'11.1.2'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version:'3.9'
-    implementation group: 'com.google.guava', name: 'guava', version:'16.0.1'
-    implementation group: 'org.apache.jena', name: 'apache-jena-libs', version:'3.13.1'
-    testImplementation group: 'junit', name: 'junit', version:'4.12'
+    implementation group: 'org.spdx', name: 'spdx-tools', version: '2.1.20'
+    implementation group: 'org.antlr', name: 'antlr', version: '3.4'
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.2'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation group: 'com.google.guava', name: 'guava', version: '16.0.1'
+    implementation group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.13.1'
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
