@@ -1,58 +1,86 @@
 plugins {
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.0.14'
+    id 'java'
+    id 'application'
+    id 'org.beryx.jlink' version '2.26.0'
 }
-apply plugin: 'java'
-apply plugin: 'application'
-apply from: "dependencies.gradle"
 
+ext {
+    versions = [
+        poi: '3.17',
+        xerces: '2.12.0',
+        jackson: '2.9.8'
+    ]
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
 group = 'groupId'
 version = '1.2.2'
-
+mainClassName = "spdxedit.Main"
 description = """SPDX Editor"""
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-mainClassName = "spdxedit.Main"
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency { DependencyResolveDetails details ->
-            if (details.requested.group == 'org.apache.poi') {
-                details.useVersion versions.poi
-            } else if (details.requested.group == 'com.fasterxml.jackson.core') {
-                details.useVersion versions.jackson
-            }
-        }
-    }
-}
+// configurations.all {
+//     resolutionStrategy {
+//         eachDependency { DependencyResolveDetails details ->
+//             if (details.requested.group == 'org.apache.poi') {
+//                 details.useVersion versions.poi
+//             } else if (details.requested.group == 'com.fasterxml.jackson.core') {
+//                 details.useVersion versions.jackson
+//             }
+//         }
+//     }
+// }
 
+//application {
+//    applicationDefaultJvmArgs = [
+//            '--add-modules=javafx.controls,javafx.swing,javafx.media,javafx.graphics']
+//    println("applicationDefaultJvmArgs:" + applicationDefaultJvmArgs)
+//}
 
 javafx {
     version = '11'
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
 }
-
+// jar {
+//     manifest {
+//         attributes 'Main-Class': 'spdxedit.Launcher'
+//     }
+//     from {
+//         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+//     }
+// }
+jlink {
+   launcher {
+       name = 'spdx-edit'
+   }
+}
 repositories {
     mavenCentral()
 }
+
 dependencies {
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.29'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.29'
-    implementation(group: 'xerces', name: 'xercesImpl', version: versions.xerces) {
-        force = true
-    }
-    implementation(group: 'org.apache.thrift', name: 'libthrift', version: '0.13.0') {
-        force = true
-    }
-    implementation group: 'org.spdx', name: 'spdx-tools', version: '2.1.20'
+    implementation "com.fasterxml.jackson.core:jackson-core:$versions.jackson"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$versions.jackson"
+    implementation group: 'com.google.guava', name: 'guava', version: '29.0-jre'
     implementation group: 'org.antlr', name: 'antlr', version: '3.4'
-    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.2'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
-    implementation group: 'com.google.guava', name: 'guava', version: '16.0.1'
     implementation group: 'org.apache.jena', name: 'apache-jena-libs', version: '3.13.1'
+    implementation group: 'org.apache.poi', name: 'poi', version: versions.poi
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: versions.poi
+    implementation group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: versions.poi
+    implementation group: 'org.apache.thrift', name: 'libthrift', version: '0.18.1'
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.2'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    implementation group: 'org.spdx', name: 'spdx-tools', version: '2.2.8'
+    implementation group: 'xerces', name: 'xercesImpl', version: versions.xerces
+    runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
+    runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
     testImplementation group: 'junit', name: 'junit', version: '4.12'
+    // runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
 }
