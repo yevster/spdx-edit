@@ -24,37 +24,18 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-
-// configurations.all {
-//     resolutionStrategy {
-//         eachDependency { DependencyResolveDetails details ->
-//             if (details.requested.group == 'org.apache.poi') {
-//                 details.useVersion versions.poi
-//             } else if (details.requested.group == 'com.fasterxml.jackson.core') {
-//                 details.useVersion versions.jackson
-//             }
-//         }
-//     }
-// }
-
-//application {
-//    applicationDefaultJvmArgs = [
-//            '--add-modules=javafx.controls,javafx.swing,javafx.media,javafx.graphics']
-//    println("applicationDefaultJvmArgs:" + applicationDefaultJvmArgs)
-//}
-
 javafx {
-    version = '11'
-    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.base']
+    version = '17'
+    modules = ['javafx.controls', 'javafx.fxml']
 }
-// jar {
-//     manifest {
-//         attributes 'Main-Class': 'spdxedit.Launcher'
-//     }
+jar {
+    manifest {
+        attributes 'Main-Class': 'spdxedit.Launcher'
+    }
 //     from {
 //         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
 //     }
-// }
+}
 jlink {
    launcher {
        name = 'spdx-edit'
@@ -81,6 +62,6 @@ dependencies {
     implementation group: 'xerces', name: 'xercesImpl', version: versions.xerces
     runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:linux"
     runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:win"
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
     // runtimeOnly "org.openjfx:javafx-graphics:$javafx.version:mac"
+    testImplementation group: 'junit', name: 'junit', version: '4.12'
 }
